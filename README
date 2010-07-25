@@ -1,3 +1,9 @@
-When I switched to MacOS X and iTunes there was no free album art downloader, which would be able to find more than 1/10 arts for my music library. But almost all arts available on last.fm.
+LastCover
+=========
+LastCover is the Last.fm based album art fetcher for iTunes
 
-So, meet LastCover – the Last.fm based album art fetcher for iTunes
+Meleshkin Valeryi http://twitter.com/nekrograve
+
+Dependencies
+============
+* EyeTunes http://code.google.com/p/eyetunes/
