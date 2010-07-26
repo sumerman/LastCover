@@ -176,11 +176,10 @@
 	NSImage *art = nil;
 	NSArray *variants = nil;
 	
-	if ([[prevDesc.track artist] isEqual:[trackd.track artist]])
-		if ([[prevDesc.track album] isEqual:[trackd.track album]]) {
-			art = self.prevArt;
-			variants = self.prevVariants;
-		}
+	if ([prevDesc isInSameAlbumWith:trackd]) {
+		art = self.prevArt;
+		variants = self.prevVariants;
+	}
 	
 	art = art ? art : [[self class] fetchCoverForArtist:[trackd.track artist] album:[trackd.track album]];
 	self.prevArt = art;

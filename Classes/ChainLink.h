@@ -30,5 +30,5 @@
 - (void)addTrackDescs:(NSArray *)tracks;
 
 - (void)processTracks;
-- (BOOL)processTrack:(TrackDesc *)track; 
+
 @end

@@ -29,5 +29,7 @@
 - (void)setTrack:(ETTrack *)aTrack;
 - (ETTrack *)track;
 
+- (BOOL)isInSameAlbumWith:(TrackDesc *)desc;
+
 @end
 

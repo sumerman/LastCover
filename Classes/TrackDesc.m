@@ -59,7 +59,15 @@
 }
 
 - (NSString *)description {
-	return [track name];
+	return [NSString stringWithFormat:@"TrackDesc: name:%@ album:%@\nartwork:%@\nnewArtwork%@\nnewArtworkVariants:%@", 
+			[track name], [track album], [track artwork], self.newArtwork, self.newArtworkVariants];
+}
+
+- (BOOL)isInSameAlbumWith:(TrackDesc *)trackd {
+	if ([[self.track artist] isEqual:[trackd.track artist]])
+		if ([[self.track album] isEqual:[trackd.track album]])
+			return YES;
+	return NO;
 }
 
 @end

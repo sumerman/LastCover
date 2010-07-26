@@ -15,6 +15,8 @@
 - (void)mainRoutine:(id)obj;
 - (BOOL)isInSeparateThread;
 
+- (BOOL)processTrack:(TrackDesc *)track; 
+
 @property (assign, getter=isDone) BOOL done;
 @property (assign, getter=isWorking) BOOL working;
 
@@ -84,15 +86,13 @@
 
 - (void)mainRoutine:(id)obj {
 	self.working = YES;
+	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	
 	while (![self isDone]) {
-		NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-		
 		[self processTracks];
-		
-		[pool release];
 		[NSThread sleepForTimeInterval:0.1];
 	}
+	[pool release];
 	self.working = NO;
 }
 
@@ -115,12 +115,14 @@
 	for (id track in tracks) {
 		NSAssert([track isMemberOfClass:[TrackDesc class]], @"track isn't kind of TrackDesc class");
 	}
+	
 	[lock lock];
 	[unprocessedTracks addObjectsFromArray:tracks];
 	[lock unlock];
 }
 
 - (void)processTracks {
+	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	// enumerate through unproc tracks, 
 	// call processTrack for each, 
 	// and then add it to proccessed
@@ -144,6 +146,7 @@
 		}
 		
 	}
+	[pool release];
 }
 
 - (BOOL)processTrack:(TrackDesc *)track {
