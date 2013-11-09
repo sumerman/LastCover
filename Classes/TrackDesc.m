@@ -2,35 +2,35 @@
 //  TrackDesc.m
 //  LastCover
 //
-//  Created by Meleshkin Valeryi on 11.07.10.
-//  Copyright 2010 Terem-media. All rights reserved.
+//  Created by Meleshkin Valery on 11.07.10.
+//  Copyright 2010 Meleshkin Valery. All rights reserved.
 //
 
 #import "TrackDesc.h"
 
 @implementation TrackDesc
 
-@synthesize newArtwork, newArtworkVariants;
+@synthesize theNewArtwork, theNewArtworkVariants;
 @dynamic track;
 
 - init {
 	return [self initWithTrack:nil];
 }
-- initWithTrack:(ETTrack *)aTrack {
+- initWithTrack:(iTunesTrack *)aTrack {
 	[super init];
 	
-	self.newArtwork = nil;
-	self.newArtworkVariants = nil;
+	self.theNewArtwork = nil;
+	self.theNewArtworkVariants = nil;
 	[self setTrack:aTrack];
 	
 	return self;
 }
 
-+ trackDescWithTrack:(ETTrack *)aTrack {
++ trackDescWithTrack:(iTunesTrack *)aTrack {
 	return [[[[self class] alloc] initWithTrack:aTrack] autorelease];
 }
 
-- (void)setTrack:(ETTrack *)aTrack {
+- (void)setTrack:(iTunesTrack *)aTrack {
 	if (track)
 		return;
 	
@@ -38,13 +38,13 @@
 	track = [aTrack retain];
 }
 
-- (ETTrack *)track {
+- (iTunesTrack *)track {
 	return track;
 }
 
 - (void)dealloc {
-	self.newArtwork = nil;
-	self.newArtworkVariants = nil;
+	self.theNewArtwork = nil;
+	self.theNewArtworkVariants = nil;
 	[track release];
 	
 	[super dealloc];
@@ -60,7 +60,7 @@
 
 - (NSString *)description {
 	return [NSString stringWithFormat:@"TrackDesc: name:%@ album:%@\nartwork:%@\nnewArtwork%@\nnewArtworkVariants:%@", 
-			[track name], [track album], [track artwork], self.newArtwork, self.newArtworkVariants];
+			[track name], [track album], [track artworks], self.theNewArtwork, self.theNewArtworkVariants];
 }
 
 - (BOOL)isInSameAlbumWith:(TrackDesc *)trackd {

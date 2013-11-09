@@ -2,14 +2,14 @@
 //  CoverSaver.m
 //  LastCover
 //
-//  Created by Meleshkin Valeryi on 23.07.10.
-//  Copyright 2010 Terem-media. All rights reserved.
+//  Created by Meleshkin Valery on 23.07.10.
+//  Copyright 2010 Meleshkin Valery. All rights reserved.
 //
 
-#import <EyeTunes/EyeTunes.h>
+#import "iTunes.h"
 #import "CoverSaver.h"
 #import "DefaultsDefines.h"
-
+#import "LastCoverAppDelegate.h"
 
 @implementation CoverSaver
 
@@ -28,21 +28,20 @@
 	
 	BOOL saveForNowPlaying = [[NSUserDefaults standardUserDefaults] boolForKey:SAVE_COVER_IN_PLAYING_TRACK];
 	
-	//NSLog(@"%d", saveForNowPlaying);
-	
-	if (!trackd.newArtwork)
+	if (!trackd.theNewArtwork)
 		return NO;
-
-	if (([trackd.track databaseId] == [[[EyeTunes sharedInstance] currentTrack] databaseId]) && !saveForNowPlaying) {
-		//NSLog(@"skip!!!!!!!");
+    
+    LastCoverAppDelegate *delegate = [[NSApplication sharedApplication] delegate];
+    iTunesTrack *curTrk = [[delegate itunes] currentTrack];
+	if (([trackd.track.persistentID isEqualToString:curTrk.persistentID]) && !saveForNowPlaying) {
+		//NSLog(@"skipping");
 		[self addTrackDesc:trackd];
 		return NO;
 	}
-	
-	NSArray *arts = [[NSArray alloc] initWithObjects:trackd.newArtwork, nil];
-	[trackd.track setArtwork:arts];
-	[arts release];
-	
+    
+    NSUInteger artid = trackd.track.artworks.count;
+    iTunesArtwork *aw = [trackd.track.artworks objectAtIndex:artid];
+    aw.data = trackd.theNewArtwork;
 	NSLog(@"Saved: %@ - %@", [trackd.track album], [trackd.track name]);
 	return YES;
 }

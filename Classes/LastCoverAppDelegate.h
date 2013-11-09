@@ -2,13 +2,13 @@
 //  LastCoverAppDelegate.h
 //  LastCover
 //
-//  Created by Meleshkin Valeryi on 08.07.10.
-//  Copyright 2010 Terem-media. All rights reserved.
+//  Created by Meleshkin Valery on 08.07.10.
+//  Copyright 2010 Meleshkin Valery. All rights reserved.
 //
 
 #import <Cocoa/Cocoa.h>
-#import <EyeTunes/EyeTunes.h>
 
+#import "iTunes.h"
 #import "CoverSaver.h"
 #import "CoverFetcher.h"
 
@@ -28,7 +28,7 @@
 	
 	NSTimer *updateTimer;
 	
-	EyeTunes *eyeTunes;
+	iTunesApplication *iTunesApp;
 	
 	CoverSaver *coverSaver;
 	CoverFetcher *coverFetcher;
@@ -54,6 +54,8 @@
 - (void)applicationClosed:(NSNotification *)notif;
 
 - (void)updateTimerFired:(NSTimer *)timer;
+
+- (iTunesApplication *) itunes;
 
 
 @end

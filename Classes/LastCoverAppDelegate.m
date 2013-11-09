@@ -2,8 +2,8 @@
 //  LastCoverAppDelegate.m
 //  LastCover
 //
-//  Created by Meleshkin Valeryi on 08.07.10.
-//  Copyright 2010 Terem-media. All rights reserved.
+//  Created by Meleshkin Valery on 08.07.10.
+//  Copyright 2010 Meleshkin Valery. All rights reserved.
 //
 
 #import "LastCoverAppDelegate.h"
@@ -16,6 +16,11 @@
 + (void)initialize {
 	NSDictionary *appDefaults = [NSDictionary dictionaryWithObject:[NSNumber numberWithBool:YES] forKey:AUTO_FETCH_CURRENT];
 	[[NSUserDefaults standardUserDefaults] registerDefaults:appDefaults];
+}
+
+
+- (iTunesApplication *)itunes {
+    return iTunesApp;
 }
 
 #pragma mark -
@@ -31,7 +36,7 @@
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
-	eyeTunes = [[EyeTunes sharedInstance] retain];
+	iTunesApp = [[SBApplication applicationWithBundleIdentifier: @"com.apple.iTunes"] retain];
 	
 	LOAD_ICON(sbarIcon);
 	LOAD_ICON(sbarIconAlert);
@@ -48,7 +53,7 @@
 															   name:NSWorkspaceDidTerminateApplicationNotification object:nil];
 	
 	// schedule timer for periodically updates
-	updateTimer = [NSTimer scheduledTimerWithTimeInterval:0.5 
+	updateTimer = [NSTimer scheduledTimerWithTimeInterval:2.0
 												   target:self 
 												 selector:@selector(updateTimerFired:) 
 												 userInfo:nil 
@@ -69,7 +74,7 @@
 	
 	[updateTimer invalidate];
 	[sbarItem release];
-	[eyeTunes release];
+	[iTunesApp release];
 	[sbarMenu release];
 	[sbarIcon release];
 	[sbarIconAlert release];
@@ -108,7 +113,7 @@
 }
 
 - (void)updateTimerFired:(NSTimer *)timer {
-	ETTrack *curTrack = [eyeTunes currentTrack];
+	iTunesTrack *curTrack = iTunesApp.currentTrack;
 	if(!curTrack)
 		return;
 	
@@ -126,8 +131,9 @@
 - (IBAction)fetchForSelectedTracks:(id)sender {
 	if (!artName || !albName)
 		return;
-	
-	for (ETTrack *track in [eyeTunes selectedTracks]) {
+    
+    
+	for (iTunesTrack *track in iTunesApp.selection.get) {
 		TrackDesc *desc = [[TrackDesc alloc] initWithTrack:track];
 		
 		[coverFetcher addTrackDesc:desc];
@@ -140,30 +146,33 @@
 - (IBAction)fetchForCurrentAlbum:(id)sender {
 	if (!artName || !albName)
 		return;
-	
-	NSString *searchStr = [[NSString alloc] initWithFormat:@"%@ %@", artName, albName];
-	NSArray *albumTracks = [eyeTunes search:[eyeTunes libraryPlaylist] forString:searchStr inField:kETSearchAttributeAll];
-	
-	for (ETTrack *track in albumTracks) {
-		if (![artName isEqualToString:[track artist]])
-			continue;
-		if (![albName isEqualToString:[track album]])
-			continue;
-		
-		TrackDesc *desc = [[TrackDesc alloc] initWithTrack:track];
-		[coverFetcher addTrackDesc:desc];
-		NSLog(@"Added: %@ - %@", [desc.track album], [desc.track name]);
-		[desc release];
-	}
-	
-	[searchStr release];
+    
+    NSString *searchStr = [[NSString alloc] initWithFormat:@"%@ %@", artName, albName];
+	for (iTunesSource *src in [iTunesApp sources]) {
+        if (src.kind != iTunesESrcLibrary) continue;
+        for(iTunesLibraryPlaylist *pl in src.libraryPlaylists) {
+            NSArray *albumTracks = [pl searchFor:searchStr only:iTunesESrAAll];
+            for (iTunesTrack *track in albumTracks) {
+                if (![artName isEqualToString:[track artist]])
+                    continue;
+                if (![albName isEqualToString:[track album]])
+                    continue;
+                
+                TrackDesc *desc = [[TrackDesc alloc] initWithTrack:track];
+                [coverFetcher addTrackDesc:desc];
+                NSLog(@"Added: %@ - %@", [desc.track album], [desc.track name]);
+                [desc release];
+            }
+        }
+    }
+    [searchStr release];
 }
 
 - (IBAction)fetchForCurrentTrack:(id)sender {
 	if (!artName || !albName)
 		return;
 	
-	TrackDesc *desc = [[TrackDesc alloc] initWithTrack:[eyeTunes currentTrack]];
+	TrackDesc *desc = [[TrackDesc alloc] initWithTrack:[iTunesApp currentTrack]];
 	[coverFetcher addTrackDesc:desc];
 	NSLog(@"Added: %@ - %@", [desc.track album], [desc.track name]);
 	[desc release];

@@ -9,7 +9,7 @@
 	<key>CFBundleIconFile</key>
 	<string>lastfm.icns</string>
 	<key>CFBundleIdentifier</key>
-	<string>ru.terem-media.${PRODUCT_NAME:rfc1034identifier}</string>
+	<string>ru.sumerman.${PRODUCT_NAME:rfc1034identifier}</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
@@ -18,19 +18,19 @@
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
 	<string>0.4</string>
-	<key>NSHumanReadableCopyright</key>
-	<string>Meleshkin Valeryi (nekro.grave-at-gmail.com)</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
 	<string>1</string>
 	<key>LSMinimumSystemVersion</key>
 	<string>${MACOSX_DEPLOYMENT_TARGET}</string>
+	<key>LSUIElement</key>
+	<true/>
+	<key>NSHumanReadableCopyright</key>
+	<string>Meleshkin Valery (valery.meleshkin-at-gmail.com)</string>
 	<key>NSMainNibFile</key>
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
-	<key>LSUIElement</key>
-	<true/>
 </dict>
 </plist>
