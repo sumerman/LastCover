@@ -14,7 +14,7 @@
 @implementation CoverSaver
 
 + (void)initialize {
-	NSDictionary *saverDefaults = [NSDictionary dictionaryWithObject:[NSNumber numberWithBool:YES] forKey:SAVE_COVER_IN_PLAYING_TRACK];
+	NSDictionary *saverDefaults = @{SAVE_COVER_IN_PLAYING_TRACK: @YES};
 	[[NSUserDefaults standardUserDefaults] registerDefaults:saverDefaults];
 }
 
@@ -40,7 +40,7 @@
 	}
     
     NSUInteger artid = trackd.track.artworks.count;
-    iTunesArtwork *aw = [trackd.track.artworks objectAtIndex:artid];
+    iTunesArtwork *aw = (trackd.track.artworks)[artid];
     aw.data = trackd.theNewArtwork;
 	NSLog(@"Saved: %@ - %@", [trackd.track album], [trackd.track name]);
 	return YES;

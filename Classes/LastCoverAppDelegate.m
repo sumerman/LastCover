@@ -14,7 +14,7 @@
 @synthesize window, artName, albName, trkName, sbarMenu, sbarShowConflicts, sbarIcon, sbarIconAlert;
 
 + (void)initialize {
-	NSDictionary *appDefaults = [NSDictionary dictionaryWithObject:[NSNumber numberWithBool:YES] forKey:AUTO_FETCH_CURRENT];
+	NSDictionary *appDefaults = @{AUTO_FETCH_CURRENT: @YES};
 	[[NSUserDefaults standardUserDefaults] registerDefaults:appDefaults];
 }
 
@@ -32,17 +32,16 @@
 	NSImage *sbarImg = [[NSImage alloc] initWithContentsOfFile:sbarImgPath]; \
 	[sbarImg setSize:NSMakeSize(20.0, 20.0)]; \
 	self.name = sbarImg; \
-	[sbarImg release]; \
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
-	iTunesApp = [[SBApplication applicationWithBundleIdentifier: @"com.apple.iTunes"] retain];
+	iTunesApp = [SBApplication applicationWithBundleIdentifier: @"com.apple.iTunes"];
 	
 	LOAD_ICON(sbarIcon);
 	LOAD_ICON(sbarIconAlert);
 	
 	// status bar menu building 
-	sbarItem = [[[NSStatusBar systemStatusBar] statusItemWithLength:NSSquareStatusItemLength] retain];
+	sbarItem = [[NSStatusBar systemStatusBar] statusItemWithLength:NSSquareStatusItemLength];
 	[sbarItem setMenu:sbarMenu];
 	[sbarItem setImage:self.sbarIcon];
 	[sbarItem setHighlightMode:YES];
@@ -69,17 +68,8 @@
 {
 	[[NSUserDefaults standardUserDefaults] synchronize];
 	
-	[coverFetcher release];
-	[coverSaver release];
 	
 	[updateTimer invalidate];
-	[sbarItem release];
-	[iTunesApp release];
-	[sbarMenu release];
-	[sbarIcon release];
-	[sbarIconAlert release];
-	[window release];
-	[super dealloc];
 }
 
 - (void)setAlerted:(BOOL)alerted {
@@ -104,7 +94,7 @@
 }
 
 - (void)applicationClosed:(NSNotification *)notif {
-	NSString *bundleId = [[notif userInfo] objectForKey:@"NSApplicationBundleIdentifier"];
+	NSString *bundleId = [notif userInfo][@"NSApplicationBundleIdentifier"];
 	
 	if ([bundleId isEqual:@"com.apple.iTunes"]) {
 		//[updateTimer invalidate];
@@ -139,7 +129,6 @@
 		[coverFetcher addTrackDesc:desc];
 		NSLog(@"Added: %@ - %@", [desc.track album], [desc.track name]);
 		
-		[desc release];
 	}
 }
 
@@ -161,11 +150,9 @@
                 TrackDesc *desc = [[TrackDesc alloc] initWithTrack:track];
                 [coverFetcher addTrackDesc:desc];
                 NSLog(@"Added: %@ - %@", [desc.track album], [desc.track name]);
-                [desc release];
             }
         }
     }
-    [searchStr release];
 }
 
 - (IBAction)fetchForCurrentTrack:(id)sender {
@@ -175,7 +162,6 @@
 	TrackDesc *desc = [[TrackDesc alloc] initWithTrack:[iTunesApp currentTrack]];
 	[coverFetcher addTrackDesc:desc];
 	NSLog(@"Added: %@ - %@", [desc.track album], [desc.track name]);
-	[desc release];
 }
 
 @end

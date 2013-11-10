@@ -11,9 +11,9 @@
 
 @interface CoverFetcher ()
 
-@property (nonatomic, retain) TrackDesc *prevDesc;
-@property (nonatomic, retain) NSImage *prevArt;
-@property (nonatomic, retain) NSArray *prevVariants;
+@property (nonatomic, strong) TrackDesc *prevDesc;
+@property (nonatomic, strong) NSImage *prevArt;
+@property (nonatomic, strong) NSArray *prevVariants;
 
 @end
 
@@ -27,41 +27,37 @@
 		return nil;
 	
 	NSImage *coverImg = [[NSImage alloc] initWithContentsOfURL:[NSURL URLWithString:url]];
-	NSImageRep *repr = [[coverImg representations] objectAtIndex:0];
+	NSImageRep *repr = [coverImg representations][0];
 	[coverImg setScalesWhenResized:YES];
 	[coverImg setSize:NSMakeSize([repr pixelsWide], [repr pixelsHigh])];
 	
-	return [coverImg autorelease];
+	return coverImg;
 }
 
 + (id)JSONforMethod:(NSString *)methodStr {
     id res = nil;
-    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-    @try {
+    @autoreleasepool {
         NSString *reqUrl = [NSString stringWithFormat:@"%@/%@&api_key=%@&format=json",
                             @"http://ws.audioscrobbler.com/2.0/", methodStr, API_KEY];
         NSLog(@"req:%@", reqUrl);
         NSURL *url = [NSURL URLWithString:reqUrl];
         if (!url)
-            @throw nil;
+            return nil;
         
         NSData *bytes = [NSData dataWithContentsOfURL:url];
         if(!bytes)
-            @throw nil;
+            return nil;
         
         NSError *err = nil;
         NSDictionary *resp = [NSJSONSerialization JSONObjectWithData:bytes options:0 error:&err];
         if(err)
             NSLog(@"Error %@ occured while parsing JSON from %@", err, reqUrl);
         if(!resp)
-            @throw nil;
+            return nil;
         
-        res = [resp retain];
+        res = resp;
     }
-    @finally {
-        [pool release];
-    }
-    return [res autorelease];
+    return res;
 }
 
 + (NSString *)coverUrlForArtist:(NSString *)artistName album:(NSString *)albumName {
@@ -76,7 +72,7 @@
                            @"?method=album.getinfo&artist=%@&album=%@&autocorrect1",
                            artNameUrled, albNameUrled];
     NSDictionary *albumInfo = [[self class] JSONforMethod:methodURL];
-    return [[[[albumInfo objectForKey: @"album"] objectForKey: @"image"] lastObject] objectForKey:@"#text"];
+    return [albumInfo[@"album"][@"image"] lastObject][@"#text"];
 }
 
 /*
@@ -91,16 +87,13 @@
 */
 
 + (NSImage *)fetchCoverForArtist:(NSString *)artistName album:(NSString *)albumName {
-	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-	NSString *imageUrlString = [[[self  class] coverUrlForArtist:artistName album:albumName] retain];
-	[pool release];
+    NSString *imageUrlString = [[self  class] coverUrlForArtist:artistName album:albumName];
 	
 	if (!imageUrlString) 
 		return nil;
 	
 	NSImage *cov = [[self class] coverFromUrl:imageUrlString];
 	
-	[imageUrlString release];
 	return cov;
 }
 

@@ -20,7 +20,7 @@
 	NSMutableArray *processedTracks;
 }
 
-@property (retain) ChainLink *nextLink;
+@property (strong) ChainLink *nextLink;
 
 - init;
 - initWithNextLink:(ChainLink *)link;

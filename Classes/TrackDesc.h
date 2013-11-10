@@ -18,12 +18,11 @@
 
 @property (copy) NSImage *theNewArtwork;
 @property (copy) NSArray *theNewArtworkVariants;
-@property (retain) iTunesTrack *track;
+@property (strong) iTunesTrack *track;
 
 - init;
 - initWithTrack:(iTunesTrack *)aTrack;
 + trackDescWithTrack:(iTunesTrack *)aTrack;
-- (void)dealloc;
 
 // works only if iTunesTrack is still not assigned
 - (void)setTrack:(iTunesTrack *)aTrack;

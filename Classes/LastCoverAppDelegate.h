@@ -13,11 +13,11 @@
 #import "CoverFetcher.h"
 
 @interface LastCoverAppDelegate : NSObject {
-    NSWindow *window;
+    NSWindow *__weak window;
 	
 	NSStatusItem *sbarItem;
-	NSMenu *sbarMenu;
-	NSMenuItem *sbarShowConflicts;
+	NSMenu *__weak sbarMenu;
+	NSMenuItem *__weak sbarShowConflicts;
 	
 	NSImage *sbarIcon;
 	NSImage *sbarIconAlert;
@@ -34,12 +34,12 @@
 	CoverFetcher *coverFetcher;
 }
 
-@property (assign) IBOutlet NSWindow *window;
-@property (assign) IBOutlet NSMenu *sbarMenu;
-@property (assign) IBOutlet NSMenuItem *sbarShowConflicts;
+@property (weak) IBOutlet NSWindow *window;
+@property (weak) IBOutlet NSMenu *sbarMenu;
+@property (weak) IBOutlet NSMenuItem *sbarShowConflicts;
 
-@property (retain) NSImage *sbarIcon;
-@property (retain) NSImage *sbarIconAlert;
+@property (strong) NSImage *sbarIcon;
+@property (strong) NSImage *sbarIconAlert;
 
 @property (copy) NSString *artName;
 @property (copy) NSString *albName;

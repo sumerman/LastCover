@@ -42,7 +42,7 @@
 }
 
 - initWithNextLink:(ChainLink *)link {
-	[super init];
+	if (!(self = [super init])) return nil;
 	
 	lock = [[NSLock alloc] init];
 	processedTracks = [[NSMutableArray alloc] init];
@@ -66,15 +66,6 @@
 	while ([self isWorking]) {
 		// wait for the worker
 	}
-	[worker release];
-	
-	self.nextLink = nil;
-	
-	[unprocessedTracks release];
-	[processedTracks release];
-	[lock release];
-	
-	[super dealloc];
 }
 
 #pragma mark -
@@ -86,13 +77,13 @@
 
 - (void)mainRoutine:(id)obj {
 	self.working = YES;
-	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+	@autoreleasepool {
 	
-	while (![self isDone]) {
-		[self processTracks];
-		[NSThread sleepForTimeInterval:0.1];
+		while (![self isDone]) {
+			[self processTracks];
+			[NSThread sleepForTimeInterval:0.1];
+		}
 	}
-	[pool release];
 	self.working = NO;
 }
 
@@ -122,31 +113,30 @@
 }
 
 - (void)processTracks {
-	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+	@autoreleasepool {
 	// enumerate through unproc tracks, 
 	// call processTrack for each, 
 	// and then add it to proccessed
-	TrackDesc *curTrack = nil;
-	while ([unprocessedTracks count]) {
-		[lock lock];
-		
-		curTrack = [[unprocessedTracks objectAtIndex:0] retain];
-		[unprocessedTracks removeObjectAtIndex:0];
-		
-		[lock unlock];
-		
-		if ([self processTrack:curTrack])
-			[processedTracks addObject:curTrack];
-		[curTrack release];
-		
-		// push all processed to the nextLink
-		if (nextLink) {
-			[nextLink addTrackDescs:processedTracks];
-			[processedTracks removeAllObjects];
+		TrackDesc *curTrack = nil;
+		while ([unprocessedTracks count]) {
+			[lock lock];
+			
+			curTrack = unprocessedTracks[0];
+			[unprocessedTracks removeObjectAtIndex:0];
+			
+			[lock unlock];
+			
+			if ([self processTrack:curTrack])
+				[processedTracks addObject:curTrack];
+			
+			// push all processed to the nextLink
+			if (nextLink) {
+				[nextLink addTrackDescs:processedTracks];
+				[processedTracks removeAllObjects];
+			}
+			
 		}
-		
 	}
-	[pool release];
 }
 
 - (BOOL)processTrack:(TrackDesc *)track {
