@@ -12,7 +12,7 @@
 #import "CoverSaver.h"
 #import "CoverFetcher.h"
 
-@interface LastCoverAppDelegate : NSObject {
+@interface LastCoverAppDelegate : NSObject <NSUserNotificationCenterDelegate> {
     NSWindow *__weak window;
 	
 	NSStatusItem *sbarItem;

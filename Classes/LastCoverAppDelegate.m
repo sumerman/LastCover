@@ -35,6 +35,7 @@
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
+    [[NSUserNotificationCenter defaultUserNotificationCenter] setDelegate:self];
 	iTunesApp = [SBApplication applicationWithBundleIdentifier: @"com.apple.iTunes"];
 	
 	LOAD_ICON(sbarIcon);
@@ -127,29 +128,31 @@
 		TrackDesc *desc = [[TrackDesc alloc] initWithTrack:track];
 		
 		[coverFetcher addTrackDesc:desc];
-		NSLog(@"Added: %@ - %@", [desc.track album], [desc.track name]);
-		
+        NSLog(@"Added: %@ - %@", desc.track.album, desc.track.name);
 	}
 }
 
 - (IBAction)fetchForCurrentAlbum:(id)sender {
 	if (!artName || !albName)
 		return;
-    
-    NSString *searchStr = [[NSString alloc] initWithFormat:@"%@ %@", artName, albName];
+    [self fetchForCurrentArtist:artName album:albName];
+}
+
+- (void)fetchForCurrentArtist:(NSString*)artist album:(NSString*)album {
+    NSString *searchStr = [[NSString alloc] initWithFormat:@"%@ %@", artist, album];
 	for (iTunesSource *src in [iTunesApp sources]) {
         if (src.kind != iTunesESrcLibrary) continue;
         for(iTunesLibraryPlaylist *pl in src.libraryPlaylists) {
             NSArray *albumTracks = [pl searchFor:searchStr only:iTunesESrAAll];
             for (iTunesTrack *track in albumTracks) {
-                if (![artName isEqualToString:[track artist]])
+                if (![artist isEqualToString:[track artist]])
                     continue;
-                if (![albName isEqualToString:[track album]])
+                if (![album isEqualToString:[track album]])
                     continue;
                 
                 TrackDesc *desc = [[TrackDesc alloc] initWithTrack:track];
                 [coverFetcher addTrackDesc:desc];
-                NSLog(@"Added: %@ - %@", [desc.track album], [desc.track name]);
+                NSLog(@"Added: %@ - %@", desc.track.album, desc.track.name);
             }
         }
     }
@@ -159,9 +162,23 @@
 	if (!artName || !albName)
 		return;
 	
-	TrackDesc *desc = [[TrackDesc alloc] initWithTrack:[iTunesApp currentTrack]];
+	TrackDesc *desc = [[TrackDesc alloc] initWithTrack:iTunesApp.currentTrack];
 	[coverFetcher addTrackDesc:desc];
-	NSLog(@"Added: %@ - %@", [desc.track album], [desc.track name]);
+	NSLog(@"Added: %@ - %@", desc.track.album, desc.track.name);
 }
+
+#pragma mark -
+#pragma mark User Notification Center Delegate
+
+- (BOOL)userNotificationCenter:(NSUserNotificationCenter *)center shouldPresentNotification:(NSUserNotification *)notification {
+    return YES;
+}
+
+- (void)userNotificationCenter:(NSUserNotificationCenter *)center didActivateNotification:(NSUserNotification *)notification {
+    NSString *art = notification.userInfo[@"artist"];
+    NSString *alb = notification.userInfo[@"album"];
+    [self fetchForCurrentArtist:art album:alb];
+}
+
 
 @end

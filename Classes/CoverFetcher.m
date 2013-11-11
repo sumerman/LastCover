@@ -106,13 +106,13 @@
 	if ([prevDesc isInSameAlbumWith:trackd])
 		art = self.prevArt;
 	
-	art = art ? art : [[self class] fetchCoverForArtist:[trackd.track artist] album:[trackd.track album]];
+	art = art ? art : [[self class] fetchCoverForArtist:trackd.track.artist album:trackd.track.album];
 	self.prevArt = art;
 	self.prevDesc = trackd;
 	
     trackd.theNewArtwork = art;
 	
-	NSLog(@"Fetched: %@ - %@", [trackd.track album], [trackd.track name]);
+	NSLog(@"Fetched: %@ - %@", trackd.track.album, trackd.track.name);
 	return YES;
 }
 

@@ -31,7 +31,7 @@
 	if (!trackd.theNewArtwork)
 		return NO;
     
-    LastCoverAppDelegate *delegate = [[NSApplication sharedApplication] delegate];
+    id delegate = [[NSApplication sharedApplication] delegate];
     iTunesTrack *curTrk = [[delegate itunes] currentTrack];
 	if (([trackd.track.persistentID isEqualToString:curTrk.persistentID]) && !saveForNowPlaying) {
 		//NSLog(@"skipping");
@@ -42,7 +42,7 @@
     NSUInteger artid = trackd.track.artworks.count;
     iTunesArtwork *aw = (trackd.track.artworks)[artid];
     aw.data = trackd.theNewArtwork;
-	NSLog(@"Saved: %@ - %@", [trackd.track album], [trackd.track name]);
+	NSLog(@"Saved: %@ - %@", trackd.track.album, trackd.track.name);
 	return YES;
 }
 

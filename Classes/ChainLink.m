@@ -112,11 +112,22 @@
 	[lock unlock];
 }
 
+- (void)reportFailure:(TrackDesc *)trackd {
+    NSUserNotification *notif = [[NSUserNotification alloc] init];
+    notif.title = @"Cover fetch failed";
+    notif.informativeText = [[NSString alloc] initWithFormat:@"%@ — %@", trackd.track.artist, trackd.track.album];
+    notif.hasActionButton = true;
+    notif.actionButtonTitle = @"Retry";
+    notif.userInfo = @{@"artist": trackd.track.artist,
+                       @"album": trackd.track.album};
+    [[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:notif];
+}
+
 - (void)processTracks {
 	@autoreleasepool {
-	// enumerate through unproc tracks, 
-	// call processTrack for each, 
-	// and then add it to proccessed
+        // enumerate through unproc tracks,
+        // call processTrack for each,
+        // and then add it to proccessed
 		TrackDesc *curTrack = nil;
 		while ([unprocessedTracks count]) {
 			[lock lock];
@@ -128,6 +139,8 @@
 			
 			if ([self processTrack:curTrack])
 				[processedTracks addObject:curTrack];
+            else
+                [self reportFailure:curTrack];
 			
 			// push all processed to the nextLink
 			if (nextLink) {
