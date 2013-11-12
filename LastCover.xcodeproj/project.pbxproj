@@ -13,10 +13,7 @@
 		8D11072D0486CEB800E47090 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; settings = {ATTRIBUTES = (); }; };
 		8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
 		C3138C37182E6035003359DA /* ScriptingBridge.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C3138C36182E6035003359DA /* ScriptingBridge.framework */; };
-		CD3E1ABC11F9936B007A5D6E /* CoverSaver.m in Sources */ = {isa = PBXBuildFile; fileRef = CD3E1ABB11F9936B007A5D6E /* CoverSaver.m */; };
 		CD5704BF11FC0B3500DDF73E /* Credits.html in Resources */ = {isa = PBXBuildFile; fileRef = CD5704BE11FC0B3500DDF73E /* Credits.html */; };
-		CD6F885311EA4AAC00C75B5C /* TrackDesc.m in Sources */ = {isa = PBXBuildFile; fileRef = CD6F885211EA4AAC00C75B5C /* TrackDesc.m */; };
-		CD96733B11F9638800A05D4D /* ChainLink.m in Sources */ = {isa = PBXBuildFile; fileRef = CD96733A11F9638800A05D4D /* ChainLink.m */; };
 		CDEB4DB811E761EB00A1B7D7 /* sbarIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = CDEB4DB711E761EB00A1B7D7 /* sbarIcon.png */; };
 		CDF96C8911F9BC4B002EA5D3 /* CoverFetcher.m in Sources */ = {isa = PBXBuildFile; fileRef = CDF96C8811F9BC4B002EA5D3 /* CoverFetcher.m */; };
 		CDF96CFA11F9CEC1002EA5D3 /* lastfm.icns in Resources */ = {isa = PBXBuildFile; fileRef = CDF96CF811F9CEC1002EA5D3 /* lastfm.icns */; };
@@ -51,13 +48,7 @@
 		C3138C35182E56E9003359DA /* iTunes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iTunes.h; sourceTree = "<group>"; };
 		C3138C36182E6035003359DA /* ScriptingBridge.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ScriptingBridge.framework; path = System/Library/Frameworks/ScriptingBridge.framework; sourceTree = SDKROOT; };
 		C3582C15183019D0004E1FB7 /* LastCover.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = LastCover.entitlements; sourceTree = "<group>"; };
-		CD3E1ABA11F9936B007A5D6E /* CoverSaver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CoverSaver.h; sourceTree = "<group>"; };
-		CD3E1ABB11F9936B007A5D6E /* CoverSaver.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CoverSaver.m; sourceTree = "<group>"; };
 		CD5704BE11FC0B3500DDF73E /* Credits.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = Credits.html; sourceTree = "<group>"; };
-		CD6F885211EA4AAC00C75B5C /* TrackDesc.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TrackDesc.m; sourceTree = "<group>"; };
-		CD80C73211EA328400DA34EE /* TrackDesc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TrackDesc.h; sourceTree = "<group>"; };
-		CD96733911F9638800A05D4D /* ChainLink.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ChainLink.h; sourceTree = "<group>"; };
-		CD96733A11F9638800A05D4D /* ChainLink.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ChainLink.m; sourceTree = "<group>"; };
 		CDEB4DB711E761EB00A1B7D7 /* sbarIcon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = sbarIcon.png; sourceTree = "<group>"; };
 		CDF96C8711F9BC4B002EA5D3 /* CoverFetcher.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CoverFetcher.h; sourceTree = "<group>"; };
 		CDF96C8811F9BC4B002EA5D3 /* CoverFetcher.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CoverFetcher.m; sourceTree = "<group>"; };
@@ -84,12 +75,6 @@
 			children = (
 				256AC3D80F4B6AC300CF3369 /* LastCoverAppDelegate.h */,
 				256AC3D90F4B6AC300CF3369 /* LastCoverAppDelegate.m */,
-				CD80C73211EA328400DA34EE /* TrackDesc.h */,
-				CD6F885211EA4AAC00C75B5C /* TrackDesc.m */,
-				CD96733911F9638800A05D4D /* ChainLink.h */,
-				CD96733A11F9638800A05D4D /* ChainLink.m */,
-				CD3E1ABA11F9936B007A5D6E /* CoverSaver.h */,
-				CD3E1ABB11F9936B007A5D6E /* CoverSaver.m */,
 				CDF96C8711F9BC4B002EA5D3 /* CoverFetcher.h */,
 				CDF96C8811F9BC4B002EA5D3 /* CoverFetcher.m */,
 			);
@@ -126,7 +111,6 @@
 		29B97314FDCFA39411CA2CEA /* LastCover */ = {
 			isa = PBXGroup;
 			children = (
-				C3582C15183019D0004E1FB7 /* LastCover.entitlements */,
 				080E96DDFE201D6D7F000001 /* Classes */,
 				29B97315FDCFA39411CA2CEA /* Other Sources */,
 				29B97317FDCFA39411CA2CEA /* Resources */,
@@ -150,6 +134,7 @@
 		29B97317FDCFA39411CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				C3582C15183019D0004E1FB7 /* LastCover.entitlements */,
 				CD5704BE11FC0B3500DDF73E /* Credits.html */,
 				CDEB4DAF11E760F500A1B7D7 /* Images */,
 				8D1107310486CEB800E47090 /* LastCover-Info.plist */,
@@ -260,9 +245,6 @@
 			files = (
 				8D11072D0486CEB800E47090 /* main.m in Sources */,
 				256AC3DA0F4B6AC300CF3369 /* LastCoverAppDelegate.m in Sources */,
-				CD6F885311EA4AAC00C75B5C /* TrackDesc.m in Sources */,
-				CD96733B11F9638800A05D4D /* ChainLink.m in Sources */,
-				CD3E1ABC11F9936B007A5D6E /* CoverSaver.m in Sources */,
 				CDF96C8911F9BC4B002EA5D3 /* CoverFetcher.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

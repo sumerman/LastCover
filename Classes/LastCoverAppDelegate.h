@@ -9,7 +9,6 @@
 #import <Cocoa/Cocoa.h>
 
 #import "iTunes.h"
-#import "CoverSaver.h"
 #import "CoverFetcher.h"
 
 @interface LastCoverAppDelegate : NSObject <NSUserNotificationCenterDelegate> {
@@ -29,9 +28,6 @@
 	NSTimer *updateTimer;
 	
 	iTunesApplication *iTunesApp;
-	
-	CoverSaver *coverSaver;
-	CoverFetcher *coverFetcher;
 }
 
 @property (weak) IBOutlet NSWindow *window;

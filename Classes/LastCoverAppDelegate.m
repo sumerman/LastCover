@@ -58,9 +58,6 @@
 												 selector:@selector(updateTimerFired:) 
 												 userInfo:nil 
 												  repeats:YES];
-	
-	coverSaver = [[CoverSaver alloc] init];
-	coverFetcher = [[CoverFetcher alloc] initWithNextLink:coverSaver];
 }
 
 #undef LOAD_ICON
@@ -83,6 +80,20 @@
 
 - (BOOL)isAlerted {
 	return [sbarShowConflicts isEnabled];
+}
+
+- (void) fetchTracksBatch:(NSArray *)b {
+    FetchBatch(b, ^(NSArray *fails) {
+        iTunesTrack *track = [fails lastObject];
+        NSUserNotification *notif = [[NSUserNotification alloc] init];
+        notif.title = @"Cover fetch failed";
+        notif.informativeText = [[NSString alloc] initWithFormat:@"%@ — %@", track.artist, track.album];
+        notif.hasActionButton = true;
+        notif.actionButtonTitle = @"Retry";
+        notif.userInfo = @{@"artist": track.artist,
+                           @"album": track.album};
+        [[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:notif];
+    });
 }
 
 #pragma mark -
@@ -108,28 +119,20 @@
 	if(!curTrack)
 		return;
 	
-	if ([trkName isEqual:[curTrack name]])
+	if ([trkName isEqual:curTrack.name])
 		return;
 	
-	self.trkName = [curTrack name];
-	self.artName = [curTrack artist];
-	self.albName = [curTrack album];
+	self.trkName = curTrack.name;
+	self.artName = curTrack.artist;
+	self.albName = curTrack.album;
 	
 	if ([[NSUserDefaults standardUserDefaults] boolForKey:AUTO_FETCH_CURRENT])
 		[self fetchForCurrentTrack:self];
 }
 
 - (IBAction)fetchForSelectedTracks:(id)sender {
-	if (!artName || !albName)
-		return;
-    
-    
-	for (iTunesTrack *track in iTunesApp.selection.get) {
-		TrackDesc *desc = [[TrackDesc alloc] initWithTrack:track];
-		
-		[coverFetcher addTrackDesc:desc];
-        NSLog(@"Added: %@ - %@", desc.track.album, desc.track.name);
-	}
+    NSMutableArray *batch = iTunesApp.selection.get;
+    [self fetchTracksBatch:batch];
 }
 
 - (IBAction)fetchForCurrentAlbum:(id)sender {
@@ -140,31 +143,29 @@
 
 - (void)fetchForCurrentArtist:(NSString*)artist album:(NSString*)album {
     NSString *searchStr = [[NSString alloc] initWithFormat:@"%@ %@", artist, album];
+    NSMutableArray *batch = [[NSMutableArray alloc] init];
 	for (iTunesSource *src in [iTunesApp sources]) {
         if (src.kind != iTunesESrcLibrary) continue;
         for(iTunesLibraryPlaylist *pl in src.libraryPlaylists) {
             NSArray *albumTracks = [pl searchFor:searchStr only:iTunesESrAAll];
             for (iTunesTrack *track in albumTracks) {
-                if (![artist isEqualToString:[track artist]])
+                if (![artist isEqualToString:track.artist])
                     continue;
-                if (![album isEqualToString:[track album]])
+                if (![album isEqualToString:track.album])
                     continue;
                 
-                TrackDesc *desc = [[TrackDesc alloc] initWithTrack:track];
-                [coverFetcher addTrackDesc:desc];
-                NSLog(@"Added: %@ - %@", desc.track.album, desc.track.name);
+                [batch addObject:track];
             }
         }
     }
+    [self fetchTracksBatch:batch];
 }
 
 - (IBAction)fetchForCurrentTrack:(id)sender {
 	if (!artName || !albName)
 		return;
-	
-	TrackDesc *desc = [[TrackDesc alloc] initWithTrack:iTunesApp.currentTrack];
-	[coverFetcher addTrackDesc:desc];
-	NSLog(@"Added: %@ - %@", desc.track.album, desc.track.name);
+    
+    [self fetchTracksBatch:@[iTunesApp.currentTrack]];
 }
 
 #pragma mark -

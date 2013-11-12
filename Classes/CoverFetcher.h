@@ -7,16 +7,6 @@
 //
 
 #import <Cocoa/Cocoa.h>
-#import "ChainLink.h"
 
-
-@interface CoverFetcher : ChainLink {
-	TrackDesc *prevDesc;
-	NSImage *prevArt;
-	NSArray *prevVariants;
-}
-
-+ (NSImage *)fetchCoverForArtist:(NSString *)artistName album:(NSString *)albumName;
-//+ (NSArray *)fetchCoversForAlbum:(NSString *)albumName;
-
-@end
+typedef void (^FetchFail) (NSArray *failedTracks);
+void FetchBatch(NSArray *tracks, FetchFail onfail);

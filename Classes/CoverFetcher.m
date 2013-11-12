@@ -8,21 +8,16 @@
 
 #import "CoverFetcher.h"
 #import "DefaultsDefines.h"
+#import "LastCoverAppDelegate.h"
 
-@interface CoverFetcher ()
+BOOL IsInSameAlbum(iTunesTrack *t1, iTunesTrack *t2) {
+	if ([t1.artist isEqual:t2.artist])
+		if ([t1.album isEqual:t2.album])
+			return YES;
+	return NO;
+}
 
-@property (nonatomic, strong) TrackDesc *prevDesc;
-@property (nonatomic, strong) NSImage *prevArt;
-@property (nonatomic, strong) NSArray *prevVariants;
-
-@end
-
-
-@implementation CoverFetcher
-
-@synthesize prevDesc, prevArt, prevVariants;
-
-+ (NSImage *)coverFromUrl:(NSString *)url {
+NSImage * DownloadCover(NSString *url) {
 	if (!url)
 		return nil;
 	
@@ -34,7 +29,7 @@
 	return coverImg;
 }
 
-+ (id)JSONforMethod:(NSString *)methodStr {
+id JSONforMethod(NSString *methodStr) {
     id res = nil;
     @autoreleasepool {
         NSString *reqUrl = [NSString stringWithFormat:@"%@/%@&api_key=%@&format=json",
@@ -60,64 +55,92 @@
     return res;
 }
 
-+ (NSString *)coverUrlForArtist:(NSString *)artistName album:(NSString *)albumName {
-	if (artistName == nil || albumName == nil) 
+NSString * CoverURLForArtistAlbum(NSString *artistName, NSString *albumName) {
+	if (artistName == nil || albumName == nil)
 		return nil;
     
-	// string must be coverted to url-convinent format
+	// names should be url-encoded
 	NSString *artNameUrled = [artistName stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
 	NSString *albNameUrled = [albumName stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
 	
     NSString *methodURL = [NSString stringWithFormat:
                            @"?method=album.getinfo&artist=%@&album=%@&autocorrect1",
                            artNameUrled, albNameUrled];
-    NSDictionary *albumInfo = [[self class] JSONforMethod:methodURL];
+    NSDictionary *albumInfo = JSONforMethod(methodURL);
     return [albumInfo[@"album"][@"image"] lastObject][@"#text"];
 }
 
-/*
-+ (NSArray *)coversUrlForAlbum:(NSString *)albumName {
-	if (albumName == nil)
-		return nil;
-	NSString *albNameUrled = [albumName stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
-	reqUrl = [[NSString alloc] initWithFormat:
-			  @"http://ws.audioscrobbler.com/2.0/?method=album.search&album=%@&api_key=%@",
-	NSArray *nodes = [[xml rootElement] nodesForXPath:@"/lfm/results/albummatches/album/image[@size='extralarge']" error:&err];
-}
-*/
-
-+ (NSImage *)fetchCoverForArtist:(NSString *)artistName album:(NSString *)albumName {
-    NSString *imageUrlString = [[self  class] coverUrlForArtist:artistName album:albumName];
+NSImage * FetchCoverForArtistAlbum(NSString *artistName, NSString *albumName) {
+    NSString *imageUrlString = CoverURLForArtistAlbum(artistName, albumName);
 	
-	if (!imageUrlString) 
+	if (!imageUrlString)
 		return nil;
 	
-	NSImage *cov = [[self class] coverFromUrl:imageUrlString];
-	
-	return cov;
+    NSImage *res = DownloadCover(imageUrlString);
+    if (res)
+        NSLog(@"Fetched: %@ - %@", artistName, albumName);
+	return res;
 }
 
-- (BOOL)processTrack:(TrackDesc *)trackd {
-	if (!trackd)
-		return NO;
-	
-	NSImage *art = nil;
-	
-	if ([prevDesc isInSameAlbumWith:trackd])
-		art = self.prevArt;
-	
-	art = art ? art : [[self class] fetchCoverForArtist:trackd.track.artist album:trackd.track.album];
-	self.prevArt = art;
-	self.prevDesc = trackd;
-	
-    trackd.theNewArtwork = art;
-	
-	NSLog(@"Fetched: %@ - %@", trackd.track.album, trackd.track.name);
-	return YES;
+void SaveCovers(NSArray *batch, NSImage *art) {
+    NSCAssert(batch && art, @"Args must be valid objects");
+    
+    BOOL saveForNowPlaying = [[NSUserDefaults standardUserDefaults] boolForKey:SAVE_COVER_IN_PLAYING_TRACK];
+    id delegate = [[NSApplication sharedApplication] delegate];
+    
+    NSMutableArray *delayed = [[NSMutableArray alloc] init];
+    double delayInSeconds = 0.0;
+    
+    for (iTunesTrack *track in batch) {
+        iTunesTrack *curTrk = [[delegate itunes] currentTrack];
+        if (([track.persistentID isEqualToString:curTrk.persistentID]) && !saveForNowPlaying) {
+            delayInSeconds = track.duration;
+            [delayed addObject:track];
+            continue;
+        }
+        
+        NSUInteger artid = track.artworks.count;
+        iTunesArtwork *aw = (track.artworks)[artid];
+        aw.data = art;
+        NSLog(@"Saved: %@ — %@ — %@", track.artist, track.album, track.name);
+    }
+    
+    if ([delayed count]) {
+        dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
+        dispatch_after(popTime, dispatch_get_current_queue(), ^(void){
+            SaveCovers(delayed, art);
+        });
+    }
 }
 
-- (BOOL)isInSeparateThread {
-	return YES;
+typedef NSImage * (^FetchCont) ();
+
+void DoDispatch(FetchCont cont, NSArray *batch, FetchFail onfail) {
+    if (!batch || !cont) return;
+    
+    dispatch_queue_t q = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+    dispatch_async(q, ^{
+        NSImage *art = cont();
+        if(art) SaveCovers(batch, art);
+        else dispatch_async(dispatch_get_main_queue(), ^{ onfail(batch); });
+    });
 }
 
-@end
+void FetchBatch(NSArray *tracks, FetchFail onfail) {
+    iTunesTrack *prevTrack = nil;
+    FetchCont cont = nil;
+    NSMutableArray *albumBatch = nil;
+    for (iTunesTrack *track in tracks) {
+        if (!IsInSameAlbum(prevTrack, track)) {
+            DoDispatch(cont, albumBatch, onfail);
+            albumBatch = [[NSMutableArray alloc] init];
+            cont = ^NSImage *() {
+                return FetchCoverForArtistAlbum(track.artist, track.album);
+            };
+        }
+        [albumBatch addObject:track];
+        prevTrack = track;
+        NSLog(@"Added: %@ — %@ — %@", track.artist, track.album, track.name);
+    }
+    DoDispatch(cont, albumBatch, onfail);
+}
