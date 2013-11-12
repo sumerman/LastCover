@@ -44,9 +44,10 @@
 - initWithNextLink:(ChainLink *)link {
 	if (!(self = [super init])) return nil;
 	
-	lock = [[NSLock alloc] init];
-	processedTracks = [[NSMutableArray alloc] init];
-	unprocessedTracks = [[NSMutableArray alloc] init];
+    for (int32_t i = 0; i < IN_N; ++i) {
+        incomingQueues[i] = [[NSMutableArray alloc] init];
+    }
+    currentIncoming = 0;
 	
 	self.nextLink = link;
 	
@@ -68,6 +69,21 @@
 	}
 }
 
+- (__weak NSMutableArray *)incomingQueue {
+    return incomingQueues[currentIncoming];
+}
+
+- (int32_t)swapIncoming {
+    BOOL res = false;
+    int32_t prev = 0;
+    while (res == false) {
+        prev = currentIncoming;
+        int32_t newv = (prev + 1) % IN_N;
+        res = OSAtomicCompareAndSwap32Barrier(prev, newv, &currentIncoming);
+    }
+    return prev;
+}
+
 #pragma mark -
 #pragma mark Worker thread stuff
 
@@ -78,7 +94,6 @@
 - (void)mainRoutine:(id)obj {
 	self.working = YES;
 	@autoreleasepool {
-	
 		while (![self isDone]) {
 			[self processTracks];
 			[NSThread sleepForTimeInterval:0.1];
@@ -94,22 +109,20 @@
 	if (!track)
 		return;
 	
-	[lock lock];
-	[unprocessedTracks addObject:track];
-	[lock unlock];
+    NSMutableArray *q = [self incomingQueue];
+    @synchronized(q) {
+        [q addObject:@[track]];
+    }
 }
 
 - (void)addTrackDescs:(NSArray *)tracks {
 	if (!tracks)
 		return;
-	
-	for (id track in tracks) {
-		NSAssert([track isMemberOfClass:[TrackDesc class]], @"track isn't kind of TrackDesc class");
-	}
-	
-	[lock lock];
-	[unprocessedTracks addObjectsFromArray:tracks];
-	[lock unlock];
+
+    NSMutableArray *q = [self incomingQueue];
+    @synchronized(q) {
+        [q addObject:tracks];
+    }
 }
 
 - (void)reportFailure:(TrackDesc *)trackd {
@@ -124,32 +137,26 @@
 }
 
 - (void)processTracks {
+    if ([[self incomingQueue] count] == 0)
+        return;
+    
+    int32_t prevq = [self swapIncoming];
+    NSMutableArray *q_to_process = incomingQueues[prevq];
+    NSMutableArray *processedTracks = [[NSMutableArray alloc] init];
 	@autoreleasepool {
-        // enumerate through unproc tracks,
-        // call processTrack for each,
-        // and then add it to proccessed
-		TrackDesc *curTrack = nil;
-		while ([unprocessedTracks count]) {
-			[lock lock];
-			
-			curTrack = unprocessedTracks[0];
-			[unprocessedTracks removeObjectAtIndex:0];
-			
-			[lock unlock];
-			
-			if ([self processTrack:curTrack])
-				[processedTracks addObject:curTrack];
-            else
-                [self reportFailure:curTrack];
-			
-			// push all processed to the nextLink
-			if (nextLink) {
-				[nextLink addTrackDescs:processedTracks];
-				[processedTracks removeAllObjects];
-			}
-			
-		}
-	}
+        for (NSArray *batch in q_to_process) {
+            for (TrackDesc *curTrack in batch) {
+                if ([self processTrack:curTrack])
+                    [processedTracks addObject:curTrack];
+                else
+                    [self reportFailure:curTrack];
+            }
+        }
+    }
+    // push all processed to the nextLink
+    if (nextLink)
+        [nextLink addTrackDescs:processedTracks];
+    [q_to_process removeAllObjects];
 }
 
 - (BOOL)processTrack:(TrackDesc *)track {

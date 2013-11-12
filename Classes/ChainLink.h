@@ -9,15 +9,16 @@
 #import <Cocoa/Cocoa.h>
 #import "TrackDesc.h"
 
+#define IN_N 2
+
 @interface ChainLink : NSObject {
 	ChainLink *nextLink;
 	
 	BOOL done, working;
 	NSThread *worker;
 	
-	NSLock *lock;
-	NSMutableArray *unprocessedTracks;
-	NSMutableArray *processedTracks;
+    volatile int32_t currentIncoming;
+	NSMutableArray *incomingQueues[IN_N];
 }
 
 @property (strong) ChainLink *nextLink;
