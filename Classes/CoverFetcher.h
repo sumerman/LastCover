@@ -7,6 +7,9 @@
 //
 
 #import <Cocoa/Cocoa.h>
+#import "iTunes.h"
 
 typedef void (^FetchFail) (NSArray *failedTracks);
-void FetchBatch(NSArray *tracks, FetchFail onfail);
+
+BOOL IsInSameAlbum(iTunesTrack *t1, iTunesTrack *t2);
+NSImage * FetchCoverForArtistAlbum(NSString *artistName, NSString *albumName);

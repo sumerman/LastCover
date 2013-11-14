@@ -7,17 +7,11 @@
 //
 
 #import "LastCoverAppDelegate.h"
-#import "DefaultsDefines.h"
+#import "Album.h"
 
 @implementation LastCoverAppDelegate
 
-@synthesize window, artName, albName, trkName, sbarMenu, sbarShowConflicts, sbarIcon, sbarIconAlert;
-
-+ (void)initialize {
-	NSDictionary *appDefaults = @{AUTO_FETCH_CURRENT: @YES};
-	[[NSUserDefaults standardUserDefaults] registerDefaults:appDefaults];
-}
-
+@synthesize window, albumsController, ready;
 
 - (iTunesApplication *)itunes {
     return iTunesApp;
@@ -26,159 +20,77 @@
 #pragma mark -
 #pragma mark Application Lifecycle
 
+- (void)awakeFromNib {
+    _albums = [[NSMutableArray alloc] init];
+    jobs = [[NSOperationQueue alloc] init];
+}
 
-#define LOAD_ICON(name) {\
-	NSString *sbarImgPath = [[NSBundle mainBundle] pathForResource:@#name ofType:@"png"]; \
-	NSImage *sbarImg = [[NSImage alloc] initWithContentsOfFile:sbarImgPath]; \
-	[sbarImg setSize:NSMakeSize(20.0, 20.0)]; \
-	self.name = sbarImg; \
+- (BOOL)applicationShouldTerminateAfterLastWindowClosed:(NSApplication *)theApplication {
+    return YES;
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
-    [[NSUserNotificationCenter defaultUserNotificationCenter] setDelegate:self];
 	iTunesApp = [SBApplication applicationWithBundleIdentifier: @"com.apple.iTunes"];
-	
-	LOAD_ICON(sbarIcon);
-	LOAD_ICON(sbarIconAlert);
-	
-	// status bar menu building 
-	sbarItem = [[NSStatusBar systemStatusBar] statusItemWithLength:NSSquareStatusItemLength];
-	[sbarItem setMenu:sbarMenu];
-	[sbarItem setImage:self.sbarIcon];
-	[sbarItem setHighlightMode:YES];
-	
-	// subscribe to application-terminated notifications
-	[[[NSWorkspace sharedWorkspace] notificationCenter] addObserver:self 
-														   selector:@selector(applicationClosed:)
-															   name:NSWorkspaceDidTerminateApplicationNotification object:nil];
-	
-	// schedule timer for periodically updates
-	updateTimer = [NSTimer scheduledTimerWithTimeInterval:2.0
-												   target:self 
-												 selector:@selector(updateTimerFired:) 
-												 userInfo:nil 
-												  repeats:YES];
+    [self reload:self];
 }
 
-#undef LOAD_ICON
-
-- (void) dealloc
-{
-	[[NSUserDefaults standardUserDefaults] synchronize];
-	
-	
-	[updateTimer invalidate];
-}
-
-- (void)setAlerted:(BOOL)alerted {
-	if (alerted)
-		[sbarItem setImage:self.sbarIconAlert];
-	else
-		[sbarItem setImage:self.sbarIcon];
-	[sbarShowConflicts setEnabled:alerted];
-}
-
-- (BOOL)isAlerted {
-	return [sbarShowConflicts isEnabled];
-}
-
-- (void) fetchTracksBatch:(NSArray *)b {
-    FetchBatch(b, ^(NSArray *fails) {
-        iTunesTrack *track = [fails lastObject];
-        NSUserNotification *notif = [[NSUserNotification alloc] init];
-        notif.title = @"Cover fetch failed";
-        notif.informativeText = [[NSString alloc] initWithFormat:@"%@ — %@", track.artist, track.album];
-        notif.hasActionButton = true;
-        notif.actionButtonTitle = @"Retry";
-        notif.userInfo = @{@"artist": track.artist,
-                           @"album": track.album};
-        [[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:notif];
-    });
+- (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication *)sender {
+    if ([jobs operationCount] > 0) {
+        return NSTerminateCancel;
+    }
+    return NSTerminateNow;
 }
 
 #pragma mark -
 #pragma mark Events
 
-- (IBAction)showCoverWindow:(id)sender {
-	NSLog(@"show!");
-	[window makeKeyAndOrderFront:self];
-	[[NSApplication sharedApplication] activateIgnoringOtherApps:YES];
-}
-
-- (void)applicationClosed:(NSNotification *)notif {
-	NSString *bundleId = [notif userInfo][@"NSApplicationBundleIdentifier"];
-	
-	if ([bundleId isEqual:@"com.apple.iTunes"]) {
-		//[updateTimer invalidate];
-		//[[NSApplication sharedApplication] terminate:self];
-	}
-}
-
-- (void)updateTimerFired:(NSTimer *)timer {
-	iTunesTrack *curTrack = iTunesApp.currentTrack;
-	if(!curTrack)
-		return;
-	
-	if ([trkName isEqual:curTrack.name])
-		return;
-	
-	self.trkName = curTrack.name;
-	self.artName = curTrack.artist;
-	self.albName = curTrack.album;
-	
-	if ([[NSUserDefaults standardUserDefaults] boolForKey:AUTO_FETCH_CURRENT])
-		[self fetchForCurrentTrack:self];
-}
-
-- (IBAction)fetchForSelectedTracks:(id)sender {
-    NSMutableArray *batch = iTunesApp.selection.get;
-    [self fetchTracksBatch:batch];
-}
-
-- (IBAction)fetchForCurrentAlbum:(id)sender {
-	if (!artName || !albName)
-		return;
-    [self fetchForCurrentArtist:artName album:albName];
-}
-
-- (void)fetchForCurrentArtist:(NSString*)artist album:(NSString*)album {
-    NSString *searchStr = [[NSString alloc] initWithFormat:@"%@ %@", artist, album];
-    NSMutableArray *batch = [[NSMutableArray alloc] init];
-	for (iTunesSource *src in [iTunesApp sources]) {
-        if (src.kind != iTunesESrcLibrary) continue;
-        for(iTunesLibraryPlaylist *pl in src.libraryPlaylists) {
-            NSArray *albumTracks = [pl searchFor:searchStr only:iTunesESrAAll];
-            for (iTunesTrack *track in albumTracks) {
-                if (![artist isEqualToString:track.artist])
-                    continue;
-                if (![album isEqualToString:track.album])
-                    continue;
-                
-                [batch addObject:track];
+- (IBAction)reload:(id)sender {
+    if ([jobs operationCount] > 0)
+        return;
+    self.ready = NO;
+    [jobs addOperationWithBlock:^{
+        NSMutableArray *albumsA = [self mutableArrayValueForKey:@"albums"];
+        [albumsA removeAllObjects];
+        NSMutableDictionary *artists = [[NSMutableDictionary alloc] init];
+        for (iTunesSource *src in [iTunesApp sources]) {
+            if (src.kind != iTunesESrcLibrary) continue;
+            for(iTunesLibraryPlaylist *pl in src.playlists) {
+                if (pl.specialKind != iTunesESpKMusic) continue;
+                for (iTunesTrack *t in pl.tracks) {
+                    NSString *artist = t.artist;
+                    if (t.albumArtist.length > 0)
+                        artist = t.albumArtist;
+                    NSMutableDictionary *albums = [artists objectForKey:[artist lowercaseString]];
+                    if (!albums) {
+                        albums = [[NSMutableDictionary alloc] init];
+                        [artists setObject:albums forKey:[artist lowercaseString]];
+                    }
+                    Album *album = [albums objectForKey:[t.album lowercaseString]];
+                    if (!album) {
+                        album = [[Album alloc] init];
+                        album.artist = artist;
+                        album.name = t.album;
+                        [albums setObject:album forKey:[t.album lowercaseString]];
+                        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                            [albumsA addObject:album];
+                        }];
+                        
+                        iTunesArtwork *aw = t.artworks[0];
+                        album.artwork = [[NSImage alloc] initWithData:aw.rawData];
+                        album.hadArtwork = album.artwork != nil;
+                        if (!album.hadArtwork) {
+                            [album fetchCover:nil];
+                        }
+                    }
+                    [album.tracks addObject:t];
+                }
             }
         }
-    }
-    [self fetchTracksBatch:batch];
-}
-
-- (IBAction)fetchForCurrentTrack:(id)sender {
-	if (!artName || !albName)
-		return;
-    
-    [self fetchTracksBatch:@[iTunesApp.currentTrack]];
-}
-
-#pragma mark -
-#pragma mark User Notification Center Delegate
-
-- (BOOL)userNotificationCenter:(NSUserNotificationCenter *)center shouldPresentNotification:(NSUserNotification *)notification {
-    return YES;
-}
-
-- (void)userNotificationCenter:(NSUserNotificationCenter *)center didActivateNotification:(NSUserNotification *)notification {
-    NSString *art = notification.userInfo[@"artist"];
-    NSString *alb = notification.userInfo[@"album"];
-    [self fetchForCurrentArtist:art album:alb];
+        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+            [albumsController rearrangeObjects];
+            self.ready = YES;
+        }];
+    }];
 }
 
 

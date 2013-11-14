@@ -7,51 +7,19 @@
 //
 
 #import <Cocoa/Cocoa.h>
-
 #import "iTunes.h"
-#import "CoverFetcher.h"
 
-@interface LastCoverAppDelegate : NSObject <NSUserNotificationCenterDelegate> {
-    NSWindow *__weak window;
-	
-	NSStatusItem *sbarItem;
-	NSMenu *__weak sbarMenu;
-	NSMenuItem *__weak sbarShowConflicts;
-	
-	NSImage *sbarIcon;
-	NSImage *sbarIconAlert;
-	
-	NSString *artName;
-	NSString *albName;
-	NSString *trkName;
-	
-	NSTimer *updateTimer;
-	
+@interface LastCoverAppDelegate : NSObject {
 	iTunesApplication *iTunesApp;
+    NSOperationQueue *jobs;
 }
 
 @property (weak) IBOutlet NSWindow *window;
-@property (weak) IBOutlet NSMenu *sbarMenu;
-@property (weak) IBOutlet NSMenuItem *sbarShowConflicts;
+@property (weak) IBOutlet NSArrayController *albumsController;
+@property (strong) NSMutableArray *albums;
+@property (assign) BOOL ready;
 
-@property (strong) NSImage *sbarIcon;
-@property (strong) NSImage *sbarIconAlert;
-
-@property (copy) NSString *artName;
-@property (copy) NSString *albName;
-@property (copy) NSString *trkName;
-
-
-- (IBAction)fetchForCurrentAlbum:(id)sender;
-- (IBAction)fetchForCurrentTrack:(id)sender;
-- (IBAction)fetchForSelectedTracks:(id)sender;
-
-- (IBAction)showCoverWindow:(id)sender;
-- (void)applicationClosed:(NSNotification *)notif;
-
-- (void)updateTimerFired:(NSTimer *)timer;
-
-- (iTunesApplication *) itunes;
-
+- (iTunesApplication *)itunes;
+- (IBAction)reload:(id)sender;
 
 @end

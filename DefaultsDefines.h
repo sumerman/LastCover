@@ -7,7 +7,5 @@
  *
  */
 
-#define AUTO_FETCH_CURRENT @"AutoFetchCurrent"
-#define SAVE_COVER_IN_PLAYING_TRACK @"SaveCoverIntoPlayingTrack"
 #define API_KEY @"909281c5e112c3c6188943448736b1d1"
 
