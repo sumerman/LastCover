@@ -34,19 +34,17 @@ id JSONforMethod(NSString *methodStr) {
                             @"http://ws.audioscrobbler.com/2.0/", methodStr, API_KEY];
         //NSLog(@"req:%@", reqUrl);
         NSURL *url = [NSURL URLWithString:reqUrl];
-        if (!url)
-            return nil;
+        if (!url) return nil;
         
+        [NSThread sleepForTimeInterval:0.1];
         NSData *bytes = [NSData dataWithContentsOfURL:url];
-        if(!bytes)
-            return nil;
+        if(!bytes) return nil;
         
         NSError *err = nil;
         NSDictionary *resp = [NSJSONSerialization JSONObjectWithData:bytes options:0 error:&err];
         if(err)
             NSLog(@"Error %@ occured while parsing JSON from %@", err, reqUrl);
-        if(!resp)
-            return nil;
+        if(!resp) return nil;
         
         res = resp;
     }
