@@ -126,11 +126,8 @@ NSImage * FetchCoverForArtistAlbum(NSString *artistName, NSString *albumName) {
 	
     NSImage *refined = DownloadCover(urlStringR);
     NSImage *exact = DownloadCover(urlStringE);
-    if (exact && refined) {
-        if (refined.size.height > exact.size.height) {
-            return refined;
-        }
-    }
-    else if (exact) return exact;
+    if (exact && refined &&
+        (refined.size.height > exact.size.height)) return refined;
+    if (exact != nil) return exact;
 	return refined;
 }
