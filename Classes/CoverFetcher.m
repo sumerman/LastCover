@@ -17,8 +17,7 @@ BOOL IsInSameAlbum(iTunesTrack *t1, iTunesTrack *t2) {
 }
 
 NSImage * DownloadCover(NSString *url) {
-	if (!url)
-		return nil;
+	if (!url || ![url hasPrefix:@"http"]) return nil;
 	
 	NSImage *coverImg = [[NSImage alloc] initWithContentsOfURL:[NSURL URLWithString:url]];
 	NSImageRep *repr = [coverImg representations][0];
@@ -54,28 +53,86 @@ id JSONforMethod(NSString *methodStr) {
     return res;
 }
 
+double rank(NSString *s1, NSString *s2) {
+    NSUInteger score = [[s1 commonPrefixWithString:s2
+                                           options:NSCaseInsensitiveSearch | NSDiacriticInsensitiveSearch]
+                        length];
+    
+    if (score == s1.length || score == s2.length)
+        score *= 2;
+    
+    NSCharacterSet *cs = [NSCharacterSet whitespaceAndNewlineCharacterSet];
+    NSSet *toks1 = [NSSet setWithArray: [s1 componentsSeparatedByCharactersInSet:cs]];
+    NSSet *toks2 = [NSSet setWithArray: [s2 componentsSeparatedByCharactersInSet:cs]];
+    NSMutableSet *res = [[NSMutableSet alloc] initWithSet:toks1];
+    [res intersectSet:toks2];
+    
+    if (res.count > 0)
+        score += [res.allObjects componentsJoinedByString:@""].length;
+    else
+        score = 0;
+    
+    return score;
+}
+
+NSString * CoverURLForArtistAlbumPlain(NSString *artistName, NSString *albumName) {
+    if (artistName == nil || albumName == nil)
+		return nil;
+    
+    NSString *albNameUrled = [albumName  stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+	NSString *artNameUrled = [artistName stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];;
+    NSString *methodURL = [NSString stringWithFormat:
+                           @"?method=album.getInfo&artist=%@&album=%@&autocorrect1",
+                           artNameUrled, albNameUrled];
+    NSDictionary *albumInfo = JSONforMethod(methodURL);
+    return ([albumInfo[@"album"][@"image"] lastObject])[@"#text"];
+}
+
 NSString * CoverURLForArtistAlbum(NSString *artistName, NSString *albumName) {
 	if (artistName == nil || albumName == nil)
 		return nil;
     
-	// names should be url-encoded
 	NSString *artNameUrled = [artistName stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
-	NSString *albNameUrled = [albumName stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
-	
     NSString *methodURL = [NSString stringWithFormat:
-                           @"?method=album.getinfo&artist=%@&album=%@&autocorrect1",
-                           artNameUrled, albNameUrled];
-    NSDictionary *albumInfo = JSONforMethod(methodURL);
-    return [albumInfo[@"album"][@"image"] lastObject][@"#text"];
+                           @"?method=artist.getTopAlbums&artist=%@&autocorrect1",
+                           artNameUrled];
+    NSDictionary *albumsInfo = JSONforMethod(methodURL);
+    NSArray *albums = albumsInfo[@"topalbums"][@"album"];
+    NSArray *ranked = [albums sortedArrayUsingComparator:^NSComparisonResult(NSDictionary *a1, NSDictionary *a2) {
+        double r1 = rank(a1[@"name"], albumName);
+        double r2 = rank(a2[@"name"], albumName);
+        if (r1 < r2) return NSOrderedAscending;
+        if (r1 > r2) return NSOrderedDescending;
+        if([a1[@"name"] localizedCaseInsensitiveCompare:a2[@"name"]] == NSOrderedAscending)
+            return NSOrderedDescending;
+        return NSOrderedSame;
+    }];
+    /*
+    NSLog(@"%@", albumName);
+    for (id r in ranked) {
+        NSLog(@"%@", r[@"name"]);
+    }
+    NSLog(@"------------");
+    */
+    
+    NSString *refinedAlbumName = ranked.lastObject[@"name"];
+    if (rank(refinedAlbumName, albumName) > 0)
+        return CoverURLForArtistAlbumPlain(artistName, refinedAlbumName);
+    else
+        return nil;
 }
 
 NSImage * FetchCoverForArtistAlbum(NSString *artistName, NSString *albumName) {
-    NSString *imageUrlString = CoverURLForArtistAlbum(artistName, albumName);
+    NSString *urlStringR = CoverURLForArtistAlbum(artistName, albumName);
+    NSString *urlStringE = CoverURLForArtistAlbumPlain(artistName, albumName);
 	
-	if (!imageUrlString)
-		return nil;
-	
-    NSImage *res = DownloadCover(imageUrlString);
-    //if (res) NSLog(@"Fetched: %@ - %@", artistName, albumName);
-	return res;
+    NSImage *refined = DownloadCover(urlStringR);
+    NSImage *exact = DownloadCover(urlStringE);
+    if (exact && refined) {
+        if (refined.size.height > exact.size.height) {
+            return refined;
+        }
+    }
+    else if (exact) return exact;
+	return refined;
 }
