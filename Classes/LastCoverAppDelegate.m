@@ -36,7 +36,7 @@
 }
 
 - (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication *)sender {
-    if ([jobs operationCount] > 0) {
+    if (self.ready && [jobs operationCount] > 0) {
         return NSTerminateCancel;
     }
     return NSTerminateNow;
@@ -46,8 +46,7 @@
 #pragma mark Events
 
 - (IBAction)reload:(id)sender {
-    if ([jobs operationCount] > 0)
-        return;
+    if ([jobs operationCount] > 0) return;
     self.ready = NO;
     __block LastCoverAppDelegate *bSelf = self;
     [jobs waitUntilAllOperationsAreFinished];
@@ -74,16 +73,19 @@
                         album.artist = artist;
                         album.name = t.album;
                         [albums setObject:album forKey:[t.album lowercaseString]];
-                        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                            [albumsA addObject:album];
-                        }];
                         
+                        BOOL alreadyHasAw = t.artworks.count > 0;
                         iTunesArtwork *aw = t.artworks[0];
-                        album.artwork = [[NSImage alloc] initWithData:aw.rawData];
-                        album.hadArtwork = album.artwork != nil;
-                        if (!album.hadArtwork) {
+                        if (!alreadyHasAw) {
                             [album fetchCover:nil];
                         }
+                        else {
+                            album.artwork = [[NSImage alloc] initWithData:aw.rawData];
+                        }
+                        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                            [albumsA addObject:album];
+                            album.hadArtwork = alreadyHasAw; // setting this prop here gives nice effect while scan in progress
+                        }];
                     }
                     [album.tracks addObject:t];
                 }
@@ -93,7 +95,18 @@
             [albumsController rearrangeObjects];
             bSelf.ready = YES;
         }];
-        [[NSOperationQueue mainQueue] waitUntilAllOperationsAreFinished];
+
+    }];
+}
+
+- (IBAction)saveAll:(id)sender {
+    if (!self.ready) return;
+    __block LastCoverAppDelegate *bSelf = self;
+    [jobs addOperationWithBlock:^{
+        [bSelf.albumsController.arrangedObjects
+         enumerateObjectsUsingBlock:^(Album *obj, NSUInteger idx, BOOL *stop) {
+            [obj saveCover];
+        }];
     }];
 }
 

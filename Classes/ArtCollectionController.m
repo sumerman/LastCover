@@ -10,23 +10,40 @@
 
 @implementation ArtCollectionController
 
-@synthesize noArtToggle;
+@synthesize noArtToggle, searchField;
 
-- (NSArray *)arrangeObjects:(NSArray *)objects {
-    if (noArtToggle) {
-        [noArtToggle setTarget:self];
-        [noArtToggle setAction:@selector(scheduleObjectsRearrange:)];
+- (NSPredicate *)buildPredicate {
+    @autoreleasepool {
+        NSMutableArray *preds = [NSMutableArray array];
+        if (noArtToggle != nil && noArtToggle.state == NSOnState) {
+            [preds addObject:
+             [NSPredicate predicateWithFormat:@"hadArtwork = NO"]];
+        }
+        if (searchField != nil &&
+            ![searchField.stringValue isEqualToString:@""]) {
+            [preds addObject:
+             [NSPredicate predicateWithFormat:
+              @"name contains[cd] %@ || artist contains[cd] %@",
+              searchField.stringValue, searchField.stringValue]];
+        }
+        if ([preds count] > 0) {
+            return [NSCompoundPredicate andPredicateWithSubpredicates:preds];
+        }
+        else {
+            return nil;
+        }
     }
-    if (noArtToggle == nil || noArtToggle.state == NSOffState) {
-        return [super arrangeObjects:objects];
-    }
-    
-    return [super arrangeObjects:[objects filteredArrayUsingPredicate:
-                                  [NSPredicate predicateWithFormat:@"hadArtwork = NO"]]];
 }
 
-- (IBAction)scheduleObjectsRearrange:(id)sender {
-    [self rearrangeObjects];
+- (void)awakeFromNib {
+    [self updatePredicate:nil];
+}
+
+- (IBAction)updatePredicate:(id)sender {
+    __block ArtCollectionController *bSelf = self;
+    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+        bSelf.filterPredicate = [bSelf buildPredicate];
+    }];
 }
 
 @end

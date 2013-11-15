@@ -33,7 +33,7 @@ id JSONforMethod(NSString *methodStr) {
     @autoreleasepool {
         NSString *reqUrl = [NSString stringWithFormat:@"%@/%@&api_key=%@&format=json",
                             @"http://ws.audioscrobbler.com/2.0/", methodStr, API_KEY];
-        NSLog(@"req:%@", reqUrl);
+        //NSLog(@"req:%@", reqUrl);
         NSURL *url = [NSURL URLWithString:reqUrl];
         if (!url)
             return nil;

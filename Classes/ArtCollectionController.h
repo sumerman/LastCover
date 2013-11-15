@@ -11,7 +11,8 @@
 @interface ArtCollectionController : NSArrayController
 
 @property (weak) IBOutlet NSButton *noArtToggle;
+@property (weak) IBOutlet NSSearchField *searchField;
 
-- (IBAction)scheduleObjectsRearrange:(id)sender;
+- (IBAction)updatePredicate:(id)sender;
 
 @end

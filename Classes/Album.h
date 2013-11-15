@@ -16,7 +16,7 @@
 @property (assign)   BOOL busy;
 @property (strong)   NSImage *artwork;
 @property (strong)   NSMutableArray *tracks;
-@property (weak)     NSOperationQueue *jobsq;
+@property (strong)   NSOperationQueue *jobsq;
 
 - (IBAction)saveCover;
 - (IBAction)fetchCover:(id)sender;

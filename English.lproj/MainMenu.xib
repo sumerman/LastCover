@@ -63,6 +63,26 @@
                         </items>
                     </menu>
                 </menuItem>
+                <menuItem title="Artworks" state="on" id="nKC-GF-OUF">
+                    <attributedString key="attributedTitle"/>
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                    <menu key="submenu" title="Artworks" id="h6P-TD-wqk">
+                        <items>
+                            <menuItem title="Reload" keyEquivalent="r" id="Wf5-fs-SgR">
+                                <connections>
+                                    <action selector="performClick:" target="UMY-lP-z7A" id="cDF-If-lsA"/>
+                                    <binding destination="494" name="enabled" keyPath="self.ready" id="9V5-1y-sEd"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Save All" keyEquivalent="S" id="Nhf-U9-Y5q">
+                                <connections>
+                                    <action selector="performClick:" target="T4P-3D-4Fr" id="vDl-CX-JHO"/>
+                                    <binding destination="494" name="enabled" keyPath="self.ready" id="SF0-Du-I2B"/>
+                                </connections>
+                            </menuItem>
+                        </items>
+                    </menu>
+                </menuItem>
                 <menuItem title="Edit" id="217">
                     <menu key="submenu" title="Edit" id="205">
                         <items>
@@ -310,7 +330,7 @@
         </customObject>
         <customObject id="420" customClass="NSFontManager"/>
         <userDefaultsController representsSharedInstance="YES" id="610"/>
-        <window title="Last Cover" allowsToolTipsWhenApplicationIsInactive="NO" oneShot="NO" releasedWhenClosed="NO" showsToolbarButton="NO" animationBehavior="default" id="q2Q-N8-99M">
+        <window title="Last Cover" allowsToolTipsWhenApplicationIsInactive="NO" deferred="NO" showsToolbarButton="NO" animationBehavior="default" id="q2Q-N8-99M">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES" unifiedTitleAndToolbar="YES"/>
             <windowCollectionBehavior key="collectionBehavior" fullScreenPrimary="YES"/>
             <rect key="contentRect" x="330" y="46" width="798" height="532"/>
@@ -323,14 +343,14 @@
                     <scrollView autohidesScrollers="YES" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" findBarPosition="belowContent" translatesAutoresizingMaskIntoConstraints="NO" id="MNn-bO-qZ8">
                         <rect key="frame" x="-1" y="21" width="800" height="512"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                        <clipView key="contentView" id="amR-iv-8rE">
+                        <clipView key="contentView" drawsBackground="NO" copiesOnScroll="NO" id="amR-iv-8rE">
                             <rect key="frame" x="1" y="1" width="798" height="510"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <collectionView selectable="YES" id="Kid-Zm-gM6">
                                     <rect key="frame" x="0.0" y="0.0" width="798" height="510"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                    <color key="primaryBackgroundColor" name="alternateSelectedControlColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="primaryBackgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                     <connections>
                                         <binding destination="yBe-oV-0Sp" name="content" keyPath="arrangedObjects" id="UBK-lt-BJB"/>
                                         <outlet property="itemPrototype" destination="VYq-mu-6dx" id="Qbi-vN-h0t"/>
@@ -370,12 +390,7 @@
                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                             </searchFieldCell>
                             <connections>
-                                <binding destination="yBe-oV-0Sp" name="predicate" keyPath="filterPredicate" id="lKj-RM-crG">
-                                    <dictionary key="options">
-                                        <string key="NSDisplayName">predicate</string>
-                                        <string key="NSPredicateFormat">name contains[cd] $value || artist contains[cd] $value</string>
-                                    </dictionary>
-                                </binding>
+                                <action selector="updatePredicate:" target="yBe-oV-0Sp" id="rAc-iB-vO0"/>
                             </connections>
                         </searchField>
                     </toolbarItem>
@@ -394,6 +409,24 @@
                             </buttonCell>
                             <connections>
                                 <action selector="reload:" target="494" id="NlU-Jq-oRO"/>
+                                <binding destination="494" name="enabled" keyPath="self.ready" id="hb3-cA-eKc"/>
+                            </connections>
+                        </button>
+                    </toolbarItem>
+                    <toolbarItem implicitItemIdentifier="7DDD91EB-3AA1-4BCF-84EE-086FD4259B21" label="SaveAll" paletteLabel="SaveAll" image="NSMenuOnStateTemplate" id="GMB-xM-n2e">
+                        <nil key="toolTip"/>
+                        <size key="minSize" width="40" height="25"/>
+                        <size key="maxSize" width="40" height="28"/>
+                        <button key="view" verticalHuggingPriority="750" id="T4P-3D-4Fr">
+                            <rect key="frame" x="3" y="14" width="40" height="28"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                            <buttonCell key="cell" type="roundTextured" title="Round Textured" bezelStyle="texturedRounded" image="NSMenuOnStateTemplate" imagePosition="only" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="Jzs-uB-qPr">
+                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                <font key="font" metaFont="system"/>
+                            </buttonCell>
+                            <connections>
+                                <action selector="saveAll:" target="494" id="PRQ-6X-yYf"/>
+                                <binding destination="494" name="enabled" keyPath="self.ready" id="sCh-q9-bEF"/>
                             </connections>
                         </button>
                     </toolbarItem>
@@ -408,11 +441,15 @@
                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES" changeBackground="YES" changeGray="YES"/>
                                 <font key="font" metaFont="systemBold" size="12"/>
                             </buttonCell>
+                            <connections>
+                                <action selector="updatePredicate:" target="yBe-oV-0Sp" id="e91-DI-G6w"/>
+                            </connections>
                         </button>
                     </toolbarItem>
                 </allowedToolbarItems>
                 <defaultToolbarItems>
                     <toolbarItem reference="1aN-42-hJy"/>
+                    <toolbarItem reference="GMB-xM-n2e"/>
                     <toolbarItem reference="6sC-Fm-7p8"/>
                     <toolbarItem reference="6sC-Fm-7p8"/>
                     <toolbarItem reference="c3T-Dj-VmF"/>
@@ -450,7 +487,7 @@
                     <constraints>
                         <constraint firstAttribute="height" constant="34" id="nt6-i7-xbA"/>
                     </constraints>
-                    <shadow key="shadow" blurRadius="2">
+                    <shadow key="shadow" blurRadius="1">
                         <color key="color" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
                     </shadow>
                     <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="center" placeholderString="Artist" id="Mjg-9B-xoE">
@@ -468,7 +505,7 @@
                     <constraints>
                         <constraint firstAttribute="height" constant="34" id="XN5-FM-Rry"/>
                     </constraints>
-                    <shadow key="shadow" blurRadius="2">
+                    <shadow key="shadow" blurRadius="1">
                         <color key="color" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
                     </shadow>
                     <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="center" placeholderString="Artist" id="OIR-pA-Vnk">
@@ -483,7 +520,7 @@
                 <progressIndicator wantsLayer="YES" horizontalHuggingPriority="750" verticalHuggingPriority="750" maxValue="100" displayedWhenStopped="NO" bezeled="NO" indeterminate="YES" style="spinning" translatesAutoresizingMaskIntoConstraints="NO" id="rCF-41-Szo">
                     <rect key="frame" x="117" y="117" width="32" height="32"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                    <shadow key="shadow" blurRadius="3">
+                    <shadow key="shadow" blurRadius="2">
                         <color key="color" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                     </shadow>
                     <connections>
@@ -493,7 +530,7 @@
                 <button wantsLayer="YES" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="sC6-vc-QY6">
                     <rect key="frame" x="186" y="20" width="60" height="60"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                    <shadow key="shadow" blurRadius="10">
+                    <shadow key="shadow" blurRadius="3">
                         <color key="color" red="0.9614955357142857" green="0.9614955357142857" blue="0.9614955357142857" alpha="1" colorSpace="calibratedRGB"/>
                     </shadow>
                     <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="NSMenuOnStateTemplate" imagePosition="only" alignment="center" imageScaling="proportionallyUpOrDown" inset="2" id="09A-y5-bud">
@@ -540,12 +577,11 @@
                 <constraint firstItem="Dql-uP-aWr" firstAttribute="trailing" secondItem="3cx-RU-knU" secondAttribute="trailing" id="rvv-fy-DrK"/>
                 <constraint firstItem="xUT-uu-Dgw" firstAttribute="centerX" secondItem="Dql-uP-aWr" secondAttribute="centerX" id="y44-U2-eNS"/>
             </constraints>
-            <shadow key="shadow" blurRadius="4">
-                <size key="offset" width="1" height="-1"/>
+            <shadow key="shadow" blurRadius="1">
                 <color key="color" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
             </shadow>
         </view>
-        <arrayController objectClassName="Album" editable="NO" automaticallyRearrangesObjects="YES" id="yBe-oV-0Sp" customClass="ArtCollectionController">
+        <arrayController objectClassName="Album" editable="NO" id="yBe-oV-0Sp" customClass="ArtCollectionController">
             <declaredKeys>
                 <string>artwork</string>
                 <string>name</string>
@@ -554,6 +590,7 @@
             <connections>
                 <binding destination="494" name="contentArray" keyPath="self.albums" id="P2Q-75-TmU"/>
                 <outlet property="noArtToggle" destination="Aih-pk-S6V" id="JKv-Uq-FTK"/>
+                <outlet property="searchField" destination="yWI-Y5-eLV" id="io4-Yx-oSg"/>
             </connections>
         </arrayController>
     </objects>

@@ -15,7 +15,8 @@
 @synthesize name, artist, tracks, artwork, hadArtwork, jobsq;
 
 - (id)init {
-    if (![super init]) return nil;
+    self = [super init];
+    if (!self) return nil;
     
     self.name = @"";
     self.artist = @"";
@@ -39,6 +40,8 @@
 }
 
 - (void)addOp:(void(^)())f {
+    if (self.busy) return;
+    
     if (!jobsq) {
         jobsq = [NSOperationQueue currentQueue];
     }
@@ -66,6 +69,9 @@
 }
 
 - (IBAction)saveCover {
+    if (self.hadArtwork) return;
+    if (!self.artwork) return;
+    
     __block Album *bSelf = self;
     [self addOp:^ {
         for (iTunesTrack *track in bSelf.tracks) {

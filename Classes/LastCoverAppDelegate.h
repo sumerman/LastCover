@@ -21,5 +21,6 @@
 
 - (iTunesApplication *)itunes;
 - (IBAction)reload:(id)sender;
+- (IBAction)saveAll:(id)sender;
 
 @end
