@@ -38,7 +38,7 @@
     return NO;
 }
 
-- (NSOperationQueue *)addOp:(void(^)(Album *bSelf))f {
+- (void)addOp:(void(^)())f {
     if (!jobsq) {
         jobsq = [NSOperationQueue currentQueue];
     }
@@ -47,15 +47,17 @@
         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
             bSelf.busy = YES;
         }];
-        f(bSelf);
+        f();
         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
             bSelf.busy = NO;
         }];
+        [[NSOperationQueue mainQueue] waitUntilAllOperationsAreFinished];
     }];
 }
 
 - (IBAction)fetchCover:(id)sender {
-    [self addOp:^(Album *bSelf) {
+    __block Album *bSelf = self;
+    [self addOp:^ {
         NSImage *art = FetchCoverForArtistAlbum(bSelf.artist, bSelf.name);
         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
             bSelf.artwork = art;
@@ -64,7 +66,8 @@
 }
 
 - (IBAction)saveCover {
-    [self addOp:^(Album *bSelf) {
+    __block Album *bSelf = self;
+    [self addOp:^ {
         for (iTunesTrack *track in bSelf.tracks) {
             iTunesArtwork *aw = (track.artworks)[0];
             aw.data = bSelf.artwork;

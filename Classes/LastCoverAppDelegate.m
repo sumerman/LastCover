@@ -23,6 +23,7 @@
 - (void)awakeFromNib {
     _albums = [[NSMutableArray alloc] init];
     jobs = [[NSOperationQueue alloc] init];
+    jobs.maxConcurrentOperationCount = NSOperationQueueDefaultMaxConcurrentOperationCount;
 }
 
 - (BOOL)applicationShouldTerminateAfterLastWindowClosed:(NSApplication *)theApplication {
@@ -48,9 +49,11 @@
     if ([jobs operationCount] > 0)
         return;
     self.ready = NO;
+    __block LastCoverAppDelegate *bSelf = self;
+    [jobs waitUntilAllOperationsAreFinished];
+    NSMutableArray *albumsA = [self mutableArrayValueForKey:@"albums"];
+    [albumsA removeAllObjects];
     [jobs addOperationWithBlock:^{
-        NSMutableArray *albumsA = [self mutableArrayValueForKey:@"albums"];
-        [albumsA removeAllObjects];
         NSMutableDictionary *artists = [[NSMutableDictionary alloc] init];
         for (iTunesSource *src in [iTunesApp sources]) {
             if (src.kind != iTunesESrcLibrary) continue;
@@ -88,8 +91,9 @@
         }
         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
             [albumsController rearrangeObjects];
-            self.ready = YES;
+            bSelf.ready = YES;
         }];
+        [[NSOperationQueue mainQueue] waitUntilAllOperationsAreFinished];
     }];
 }
 

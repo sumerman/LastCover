@@ -320,15 +320,15 @@
                 <rect key="frame" x="0.0" y="0.0" width="798" height="532"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <scrollView autohidesScrollers="YES" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="MNn-bO-qZ8">
-                        <rect key="frame" x="-1" y="-245" width="800" height="778"/>
+                    <scrollView autohidesScrollers="YES" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" findBarPosition="belowContent" translatesAutoresizingMaskIntoConstraints="NO" id="MNn-bO-qZ8">
+                        <rect key="frame" x="-1" y="21" width="800" height="512"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <clipView key="contentView" id="amR-iv-8rE">
-                            <rect key="frame" x="1" y="1" width="798" height="776"/>
+                            <rect key="frame" x="1" y="1" width="798" height="510"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <collectionView selectable="YES" id="Kid-Zm-gM6">
-                                    <rect key="frame" x="0.0" y="0.0" width="798" height="776"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="798" height="510"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <color key="primaryBackgroundColor" name="alternateSelectedControlColor" catalog="System" colorSpace="catalog"/>
                                     <connections>
@@ -349,10 +349,10 @@
                     </scrollView>
                 </subviews>
                 <constraints>
-                    <constraint firstAttribute="trailing" secondItem="MNn-bO-qZ8" secondAttribute="trailing" constant="-1" id="f2J-Am-b0t"/>
-                    <constraint firstItem="MNn-bO-qZ8" firstAttribute="leading" secondItem="ISn-ew-aYC" secondAttribute="leading" constant="-1" id="hg2-34-gno"/>
-                    <constraint firstItem="MNn-bO-qZ8" firstAttribute="top" secondItem="ISn-ew-aYC" secondAttribute="top" constant="-1" id="pMz-B7-dvY"/>
-                    <constraint firstAttribute="bottom" secondItem="MNn-bO-qZ8" secondAttribute="bottom" constant="-245" id="xgU-gV-QEQ"/>
+                    <constraint firstAttribute="bottom" secondItem="MNn-bO-qZ8" secondAttribute="bottom" constant="21" id="8H0-lW-0eq"/>
+                    <constraint firstAttribute="trailing" secondItem="MNn-bO-qZ8" secondAttribute="trailing" constant="-1" id="cuG-Hr-o3z"/>
+                    <constraint firstItem="MNn-bO-qZ8" firstAttribute="top" secondItem="ISn-ew-aYC" secondAttribute="top" constant="-1" id="fj3-1M-CWx"/>
+                    <constraint firstItem="MNn-bO-qZ8" firstAttribute="leading" secondItem="ISn-ew-aYC" secondAttribute="leading" constant="-1" id="gfZ-fa-bVL"/>
                 </constraints>
             </view>
             <toolbar key="toolbar" implicitIdentifier="A47D5A91-2C56-4D3A-8899-2FB18B92D90A" autosavesConfiguration="NO" allowsUserCustomization="NO" displayMode="iconOnly" sizeMode="regular" id="cie-QT-mPu">
@@ -501,6 +501,11 @@
                         <font key="font" metaFont="system"/>
                     </buttonCell>
                     <connections>
+                        <binding destination="VYq-mu-6dx" name="target" keyPath="representedObject" id="L2m-C9-hrp">
+                            <dictionary key="options">
+                                <string key="NSSelectorName">saveCover</string>
+                            </dictionary>
+                        </binding>
                         <binding destination="VYq-mu-6dx" name="enabled" keyPath="representedObject.artwork" id="m0x-io-ha8">
                             <dictionary key="options">
                                 <integer key="NSNullPlaceholder" value="0"/>
@@ -508,6 +513,7 @@
                                 <string key="NSValueTransformerName">NSIsNotNil</string>
                             </dictionary>
                         </binding>
+                        <binding destination="VYq-mu-6dx" name="hidden" keyPath="representedObject.hadArtwork" previousBinding="m0x-io-ha8" id="w00-zU-hcJ"/>
                         <binding destination="494" name="hidden2" keyPath="self.ready" previousBinding="w00-zU-hcJ" id="YAa-or-MBY">
                             <dictionary key="options">
                                 <integer key="NSMultipleValuesPlaceholder" value="-1"/>
@@ -515,12 +521,6 @@
                                 <integer key="NSNoSelectionPlaceholder" value="-1"/>
                                 <integer key="NSNullPlaceholder" value="-1"/>
                                 <string key="NSValueTransformerName">NSNegateBoolean</string>
-                            </dictionary>
-                        </binding>
-                        <binding destination="VYq-mu-6dx" name="hidden" keyPath="representedObject.hadArtwork" previousBinding="m0x-io-ha8" id="w00-zU-hcJ"/>
-                        <binding destination="VYq-mu-6dx" name="target" keyPath="representedObject" id="L2m-C9-hrp">
-                            <dictionary key="options">
-                                <string key="NSSelectorName">saveCover</string>
                             </dictionary>
                         </binding>
                     </connections>
