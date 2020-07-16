@@ -39,7 +39,7 @@
     return NO;
 }
 
-- (void)addOp:(void(^)())f {
+- (void)addOp:(void(^)(void))f {
     if (self.busy) return;
     
     if (!jobsq) {

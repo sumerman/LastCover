@@ -54,7 +54,7 @@
     [albumsA removeAllObjects];
     [jobs addOperationWithBlock:^{
         NSMutableDictionary *artists = [[NSMutableDictionary alloc] init];
-        for (iTunesSource *src in [iTunesApp sources]) {
+        for (iTunesSource *src in [self->iTunesApp sources]) {
             if (src.kind != iTunesESrcLibrary) continue;
             for(iTunesLibraryPlaylist *pl in src.playlists) {
                 if (pl.specialKind != iTunesESpKMusic) continue;
@@ -92,7 +92,7 @@
             }
         }
         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-            [albumsController rearrangeObjects];
+            [self->albumsController rearrangeObjects];
             bSelf.ready = YES;
         }];
 

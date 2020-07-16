@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="13196" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="16097.2" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="13196"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="16097.2"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -322,6 +322,7 @@
                     </menu>
                 </menuItem>
             </items>
+            <point key="canvasLocation" x="139" y="154"/>
         </menu>
         <customObject id="494" customClass="LastCoverAppDelegate">
             <connections>
@@ -331,15 +332,15 @@
         </customObject>
         <customObject id="420" customClass="NSFontManager"/>
         <userDefaultsController representsSharedInstance="YES" id="610"/>
-        <window title="Last Cover" allowsToolTipsWhenApplicationIsInactive="NO" deferred="NO" showsToolbarButton="NO" animationBehavior="default" id="q2Q-N8-99M">
+        <window title="Last Cover" allowsToolTipsWhenApplicationIsInactive="NO" deferred="NO" animationBehavior="default" id="q2Q-N8-99M">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
             <windowCollectionBehavior key="collectionBehavior" fullScreenPrimary="YES"/>
             <rect key="contentRect" x="330" y="46" width="798" height="532"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1680" height="1028"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="2304" height="1273"/>
             <value key="minSize" type="size" width="532" height="532"/>
             <view key="contentView" wantsLayer="YES" id="ISn-ew-aYC">
                 <rect key="frame" x="0.0" y="0.0" width="798" height="532"/>
-                <autoresizingMask key="autoresizingMask"/>
+                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                 <subviews>
                     <scrollView autohidesScrollers="YES" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" findBarPosition="belowContent" translatesAutoresizingMaskIntoConstraints="NO" id="MNn-bO-qZ8">
                         <rect key="frame" x="-1" y="21" width="800" height="512"/>
@@ -358,11 +359,11 @@
                                 </collectionView>
                             </subviews>
                         </clipView>
-                        <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="YES" id="s42-t7-h67">
+                        <scroller key="horizontalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="s42-t7-h67">
                             <rect key="frame" x="1" y="144" width="233" height="15"/>
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
-                        <scroller key="verticalScroller" hidden="YES" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="Xf1-Xn-UvU">
+                        <scroller key="verticalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="Xf1-Xn-UvU">
                             <rect key="frame" x="234" y="1" width="15" height="143"/>
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
@@ -403,7 +404,7 @@
                         <button key="view" verticalHuggingPriority="750" id="UMY-lP-z7A">
                             <rect key="frame" x="2" y="14" width="40" height="28"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                            <buttonCell key="cell" type="roundTextured" title="Round Textured" bezelStyle="texturedRounded" image="NSRefreshTemplate" imagePosition="only" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="yVM-sG-Cf6">
+                            <buttonCell key="cell" type="roundTextured" bezelStyle="texturedRounded" image="NSRefreshTemplate" imagePosition="overlaps" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="yVM-sG-Cf6">
                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                 <font key="font" metaFont="system"/>
                             </buttonCell>
@@ -420,7 +421,7 @@
                         <button key="view" verticalHuggingPriority="750" id="T4P-3D-4Fr">
                             <rect key="frame" x="3" y="14" width="40" height="28"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                            <buttonCell key="cell" type="roundTextured" title="Round Textured" bezelStyle="texturedRounded" image="NSMenuOnStateTemplate" imagePosition="only" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="Jzs-uB-qPr">
+                            <buttonCell key="cell" type="roundTextured" bezelStyle="texturedRounded" image="NSMenuOnStateTemplate" imagePosition="overlaps" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="Jzs-uB-qPr">
                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                 <font key="font" metaFont="system"/>
                             </buttonCell>
@@ -461,6 +462,7 @@
                 <outlet property="delegate" destination="494" id="MzN-92-smW"/>
                 <outlet property="menu" destination="29" id="kbi-k9-RMT"/>
             </connections>
+            <point key="canvasLocation" x="139" y="-223"/>
         </window>
         <collectionViewItem id="VYq-mu-6dx">
             <connections>
@@ -576,6 +578,7 @@
             <shadow key="shadow" blurRadius="1">
                 <color key="color" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
             </shadow>
+            <point key="canvasLocation" x="139" y="154"/>
         </view>
         <arrayController objectClassName="Album" editable="NO" id="yBe-oV-0Sp" customClass="ArtCollectionController">
             <declaredKeys>
