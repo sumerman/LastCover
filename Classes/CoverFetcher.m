@@ -92,7 +92,7 @@ NSString * CoverURLForArtistAlbum(NSString *artistName, NSString *albumName) {
     
 	NSString *artNameUrled = [artistName stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
     NSString *methodURL = [NSString stringWithFormat:
-                           @"?method=artist.getTopAlbums&artist=%@&autocorrect1",
+                           @"?method=artist.getTopAlbums&limit=1000&artist=%@&autocorrect1",
                            artNameUrled];
     NSDictionary *albumsInfo = JSONforMethod(methodURL);
     NSArray *albums = albumsInfo[@"topalbums"][@"album"];

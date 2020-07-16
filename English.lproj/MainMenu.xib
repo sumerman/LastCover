@@ -1,8 +1,9 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="4514" systemVersion="13A603" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="13196" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
-        <deployment defaultVersion="1080" identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="4514"/>
+        <deployment identifier="macosx"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="13196"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="NSApplication">
@@ -11,7 +12,7 @@
             </connections>
         </customObject>
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
-        <customObject id="-3" userLabel="Application"/>
+        <customObject id="-3" userLabel="Application" customClass="NSObject"/>
         <menu title="AMainMenu" systemMenu="main" id="29">
             <items>
                 <menuItem title="LastCover" id="56">
@@ -331,10 +332,10 @@
         <customObject id="420" customClass="NSFontManager"/>
         <userDefaultsController representsSharedInstance="YES" id="610"/>
         <window title="Last Cover" allowsToolTipsWhenApplicationIsInactive="NO" deferred="NO" showsToolbarButton="NO" animationBehavior="default" id="q2Q-N8-99M">
-            <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES" unifiedTitleAndToolbar="YES"/>
+            <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
             <windowCollectionBehavior key="collectionBehavior" fullScreenPrimary="YES"/>
             <rect key="contentRect" x="330" y="46" width="798" height="532"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="878"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1680" height="1028"/>
             <value key="minSize" type="size" width="532" height="532"/>
             <view key="contentView" wantsLayer="YES" id="ISn-ew-aYC">
                 <rect key="frame" x="0.0" y="0.0" width="798" height="532"/>
@@ -342,7 +343,6 @@
                 <subviews>
                     <scrollView autohidesScrollers="YES" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" findBarPosition="belowContent" translatesAutoresizingMaskIntoConstraints="NO" id="MNn-bO-qZ8">
                         <rect key="frame" x="-1" y="21" width="800" height="512"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <clipView key="contentView" drawsBackground="NO" copiesOnScroll="NO" id="amR-iv-8rE">
                             <rect key="frame" x="1" y="1" width="798" height="510"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -381,7 +381,7 @@
                         <nil key="toolTip"/>
                         <size key="minSize" width="96" height="15"/>
                         <size key="maxSize" width="193" height="22"/>
-                        <searchField key="view" verticalHuggingPriority="750" id="yWI-Y5-eLV">
+                        <searchField key="view" wantsLayer="YES" verticalHuggingPriority="750" id="yWI-Y5-eLV">
                             <rect key="frame" x="0.0" y="14" width="155" height="22"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                             <searchFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" placeholderString="" usesSingleLineMode="YES" bezelStyle="round" sendsSearchStringImmediately="YES" id="MkG-Uy-s05">
@@ -475,15 +475,13 @@
             <subviews>
                 <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="xUT-uu-Dgw">
                     <rect key="frame" x="5" y="5" width="256" height="256"/>
-                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     <imageCell key="cell" refusesFirstResponder="YES" alignment="left" animates="YES" imageScaling="proportionallyUpOrDown" id="C7l-Sc-AWs"/>
                     <connections>
                         <binding destination="VYq-mu-6dx" name="value" keyPath="representedObject.artwork" id="tUt-ew-DjC"/>
                     </connections>
                 </imageView>
-                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Dql-uP-aWr">
+                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" preferredMaxLayoutWidth="252" translatesAutoresizingMaskIntoConstraints="NO" id="Dql-uP-aWr">
                     <rect key="frame" x="5" y="210" width="256" height="34"/>
-                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     <constraints>
                         <constraint firstAttribute="height" constant="34" id="nt6-i7-xbA"/>
                     </constraints>
@@ -499,9 +497,8 @@
                         <binding destination="VYq-mu-6dx" name="value" keyPath="representedObject.artist" id="W9y-08-782"/>
                     </connections>
                 </textField>
-                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3cx-RU-knU">
+                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" preferredMaxLayoutWidth="252" translatesAutoresizingMaskIntoConstraints="NO" id="3cx-RU-knU">
                     <rect key="frame" x="5" y="5" width="256" height="34"/>
-                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     <constraints>
                         <constraint firstAttribute="height" constant="34" id="XN5-FM-Rry"/>
                     </constraints>
@@ -519,7 +516,6 @@
                 </textField>
                 <progressIndicator wantsLayer="YES" horizontalHuggingPriority="750" verticalHuggingPriority="750" maxValue="100" displayedWhenStopped="NO" bezeled="NO" indeterminate="YES" style="spinning" translatesAutoresizingMaskIntoConstraints="NO" id="rCF-41-Szo">
                     <rect key="frame" x="117" y="117" width="32" height="32"/>
-                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     <shadow key="shadow" blurRadius="2">
                         <color key="color" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                     </shadow>
@@ -545,8 +541,8 @@
                         </binding>
                         <binding destination="VYq-mu-6dx" name="enabled" keyPath="representedObject.artwork" id="m0x-io-ha8">
                             <dictionary key="options">
-                                <integer key="NSNullPlaceholder" value="0"/>
                                 <integer key="NSNotApplicablePlaceholder" value="1"/>
+                                <integer key="NSNullPlaceholder" value="0"/>
                                 <string key="NSValueTransformerName">NSIsNotNil</string>
                             </dictionary>
                         </binding>
@@ -554,8 +550,8 @@
                         <binding destination="494" name="hidden2" keyPath="self.ready" previousBinding="w00-zU-hcJ" id="YAa-or-MBY">
                             <dictionary key="options">
                                 <integer key="NSMultipleValuesPlaceholder" value="-1"/>
-                                <integer key="NSNotApplicablePlaceholder" value="-1"/>
                                 <integer key="NSNoSelectionPlaceholder" value="-1"/>
+                                <integer key="NSNotApplicablePlaceholder" value="-1"/>
                                 <integer key="NSNullPlaceholder" value="-1"/>
                                 <string key="NSValueTransformerName">NSNegateBoolean</string>
                             </dictionary>
@@ -596,7 +592,7 @@
     </objects>
     <resources>
         <image name="NSActionTemplate" width="14" height="14"/>
-        <image name="NSMenuOnStateTemplate" width="11" height="11"/>
-        <image name="NSRefreshTemplate" width="10" height="12"/>
+        <image name="NSMenuOnStateTemplate" width="12" height="12"/>
+        <image name="NSRefreshTemplate" width="11" height="15"/>
     </resources>
 </document>
